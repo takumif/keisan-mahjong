@@ -1,0 +1,11 @@
+{
+    "files": [
+        "src/hand.ts",
+        "src/meld.ts",
+        "src/tile.ts"
+    ],
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "target": "es5"
+    }
+}

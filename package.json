@@ -1,0 +1,30 @@
+{
+  "name": "riichi-mahjong",
+  "version": "0.0.1",
+  "description": "A library for playing and scoring riichi (Japanese) mahjong",
+  "main": "dist/mahjong.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/takumif/riichi-mahjong.git"
+  },
+  "keywords": [
+    "mahjong",
+    "riichi",
+    "mahjong"
+  ],
+  "author": "Takumi Fujimoto",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/takumif/riichi-mahjong/issues"
+  },
+  "homepage": "https://github.com/takumif/riichi-mahjong#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-typedoc": "^2.0.0",
+    "gulp-typescript": "^2.13.4",
+    "typedoc": "^0.3.12"
+  }
+}

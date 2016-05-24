@@ -19,10 +19,69 @@ export class Tile {
             }
             this.type = TileType.Honor;
         } else {
-            if (value < 0 || value > 9) {
+            if (value < 1 || value > 9) {
                 throw "Invalid number value!";
             }
             this.type = TileType.Number;
+        }
+    }
+    
+    /**
+     * Returns null if the tile is a 9 or an honor tile
+     */
+    nextNumber(): Tile {
+        if (this.type === TileType.Number) {
+            if (this.value === 9) {
+                return null;
+            } else {
+                return new Tile(this.suit, this.value + 1);
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Can be used for determining the dora
+     */
+    nextWithWrapAround(): Tile {
+        if (this.suit === Suit.Wind) {
+            switch (this.value) {
+                case Wind.East:
+                    return new Tile(this.suit, Wind.South);
+                case Wind.South:
+                    return new Tile(this.suit, Wind.West);
+                case Wind.West:
+                    return new Tile(this.suit, Wind.North);
+                case Wind.North:
+                    return new Tile(this.suit, Wind.East);
+            }
+        } else if (this.suit === Suit.Dragon) {
+            switch (this.value) {
+                case Dragon.White:
+                    return new Tile(this.suit, Dragon.Green);
+                case Dragon.Green:
+                    return new Tile(this.suit, Dragon.Red);
+                case Dragon.Red:
+                    return new Tile(this.suit, Dragon.White);
+            }
+        } else {
+            // it's a number tile
+            return new Tile(this.suit, this.value % 9 + 1);
+        }
+    }
+    
+    equals(other: Tile): boolean {
+        return this.suit === other.suit && this.value === other.value;
+    }
+    
+    toString(): string {
+        if (this.suit === Suit.Wind) {
+            return Wind[this.value];
+        } else if (this.suit === Suit.Dragon) {
+            return Dragon[this.value];
+        } else {
+            return Suit[this.suit] + String(this.value);
         }
     }
     
@@ -95,7 +154,7 @@ export class Tile {
         
         var pairs: Pair[] = [];
         for (var i = 0; i < 14; i += 2) {
-            if (tiles[i] !== tiles[i + 1]) {
+            if (!tiles[i].equals(tiles[i + 1])) {
                 return null;
             }
             pairs.push(new Pair(tiles[i], tiles[i + 1]));
@@ -105,8 +164,9 @@ export class Tile {
 
     /**
      * Returns a list of possible ways to form melds with the given tiles.
-     * We assume that the tiles are closed, and hence there are no quadruples.
-     * An empty list if no melds can be formed.
+     * We assume that the tiles are closed, and hence there are no quadruples,
+     * and there should be one to five melds (one of which a pair), or seven pairs.
+     * An empty list is returned if no melds can be formed.
      */
     static formMelds(tiles: Tile[]): Meld[][] {
         if (tiles.length % 3 !== 2) {
@@ -115,56 +175,11 @@ export class Tile {
         var tiles = Tile.copyArray(tiles);
         tiles.sort(Tile.compare);
         
-        return Tile.formMeldsWithSortedTiles(tiles);
-    }
-    
-    equals(other: Tile): boolean {
-        return this.suit === other.suit && this.value === other.value;
-    }
-    
-    /**
-     * Returns null if the tile is a 9 or an honor tile
-     */
-    nextNumber(): Tile {
-        if (this.type === TileType.Number) {
-            if (this.value === 9) {
-                return null;
-            } else {
-                return new Tile(this.suit, this.value);
-            }
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Can be used for determining the dora
-     */
-    nextWithWrapAround(): Tile {
-        if (this.suit === Suit.Wind) {
-            switch (this.value) {
-                case Wind.East:
-                    return new Tile(this.suit, Wind.South);
-                case Wind.South:
-                    return new Tile(this.suit, Wind.West);
-                case Wind.West:
-                    return new Tile(this.suit, Wind.North);
-                case Wind.North:
-                    return new Tile(this.suit, Wind.East);
-            }
-        } else if (this.suit === Suit.Dragon) {
-            switch (this.value) {
-                case Dragon.White:
-                    return new Tile(this.suit, Dragon.Green);
-                case Dragon.Green:
-                    return new Tile(this.suit, Dragon.Red);
-                case Dragon.Red:
-                    return new Tile(this.suit, Dragon.White);
-            }
-        } else {
-            // it's a number tile
-            return new Tile(this.suit, this.value % 9 + 1);
-        }
+        var meldLists = Tile.formMeldsWithSortedTiles(tiles);
+        
+        return meldLists.filter((melds, i, a) => {
+            return Meld.hasOneOrSevenPairs(melds);
+        });
     }
 
     /**
@@ -177,24 +192,20 @@ export class Tile {
         
         var meldLists: Meld[][] = [];
         
-        meldLists.concat(Tile.formMeldsWithFirstTileInPair(tiles));
-        meldLists.concat(Tile.formMeldsWithFirstTileInTriple(tiles));
-        meldLists.concat(Tile.formMeldsWithFirstTileInStraight(tiles));
+        meldLists = meldLists
+            .concat(Tile.formMeldsWithFirstTileInPair(tiles))
+            .concat(Tile.formMeldsWithFirstTileInTriple(tiles))
+            .concat(Tile.formMeldsWithFirstTileInStraight(tiles));
         
-        return meldLists.filter((melds, i, a) => {
-            return Meld.hasOneOrSevenPairs(melds);
-        });
+        return meldLists;
     }
 
     /**
      * Requires that the tiles are sorted
      */
     private static formMeldsWithFirstTileInPair(tiles: Tile[]): Meld[][] {
-        if (tiles.length % 3 !== 2) {
-            throw "Invalid number of tiles!"
-        }
-        if (!tiles[0].equals(tiles[1])) {
-            return [[]];
+        if (tiles.length < 2 || !tiles[0].equals(tiles[1])) {
+            return [];
         }
         var pair = new Pair(tiles[0], tiles[1]);
         return Tile.formMeldsWithSortedTiles(tiles.slice(2)).map((melds, i, a) => {
@@ -206,11 +217,8 @@ export class Tile {
      * Requires that the tiles are sorted
      */
     private static formMeldsWithFirstTileInTriple(tiles: Tile[]): Meld[][] {
-        if (tiles.length % 3 !== 2 || tiles.length < 3) {
-            throw "Invalid number of tiles!"
-        }
-        if (!tiles[0].equals(tiles[1]) || !tiles[0].equals(tiles[2])) {
-            return [[]];
+        if (tiles.length < 3 || !tiles[0].equals(tiles[1]) || !tiles[0].equals(tiles[2])) {
+            return [];
         }
         var triple = new Triple(tiles[0], tiles[1], tiles[2]);
         return Tile.formMeldsWithSortedTiles(tiles.slice(3)).map((melds, i, a) => {
@@ -222,12 +230,12 @@ export class Tile {
      * Requires that the tiles are sorted
      */
     private static formMeldsWithFirstTileInStraight(tiles: Tile[]): Meld[][] {
-        if (tiles.length % 3 !== 2 || tiles.length < 3) {
-            throw "Invalid number of tiles!"
+        if (tiles.length < 3) {
+            return [];
         }
         var straight = Tile.extractStraight(tiles, tiles[0]);
         if (straight === null) {
-            return [[]];
+            return [];
         } else {
             return Tile.formMeldsWithSortedTiles(straight.otherTiles).map((melds, i, a) => {
                 return melds.concat([straight.straight]);

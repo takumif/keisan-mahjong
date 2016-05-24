@@ -1,3 +1,7 @@
+import {Tile, Suit, TileType, Wind, Dragon} from "./tile"
+import {Meld, Pair, Triple, Straight, Quadruple} from "./meld"
+
+/*
 class Hand {
     constructor(
         private concealedCombinaisons: HandCombinaison[],
@@ -17,3 +21,4 @@ class Hand {
         this.isIppatsu = false;
     }
 }
+*/

@@ -1,6 +1,6 @@
-/// <reference path="tile.ts" />
+import {Tile, Suit, TileType, Wind, Dragon} from "./tile"
 
-abstract class Meld {
+export abstract class Meld {
     tiles: Tile[];
     
     static hasOneOrSevenPairs(melds: Meld[]): boolean {
@@ -14,7 +14,7 @@ abstract class Meld {
     }
 }
 
-class Pair extends Meld {
+export class Pair extends Meld {
     tiles: Tile[];
     
     constructor(tile1: Tile, tile2: Tile) {
@@ -23,21 +23,21 @@ class Pair extends Meld {
     }
 }
 
-class Triple extends Meld {
+export class Triple extends Meld {
     constructor(tile1: Tile, tile2: Tile, tile3: Tile) {
         super();
         this.tiles = [tile1, tile2, tile3];
     }
 }
 
-class Straight extends Meld {
+export class Straight extends Meld {
     constructor(tile1: Tile, tile2: Tile, tile3: Tile) {
         super();
         this.tiles = [tile1, tile2, tile3];
     }
 }
 
-class Quadruple extends Meld {
+export class Quadruple extends Meld {
     constructor(tile1: Tile, tile2: Tile, tile3: Tile, tile4: Tile) {
         super();
         this.tiles = [tile1, tile2, tile3, tile4];

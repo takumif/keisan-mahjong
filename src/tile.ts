@@ -1,6 +1,6 @@
-/// <reference path="meld.ts" />
+import {Meld, Pair, Triple, Straight, Quadruple} from "./meld"
 
-class Tile {
+export class Tile {
     suit: Suit;
     type: TileType;
     value: number | Wind | Dragon;
@@ -264,7 +264,7 @@ class Tile {
     }
 }
 
-enum Suit {
+export enum Suit {
     Character,
     Circle,
     Bamboo,
@@ -272,19 +272,19 @@ enum Suit {
     Dragon
 }
 
-enum TileType {
+export enum TileType {
     Number,     // Character, Circle or Bamboo
     Honor       // Wind or Dragon
 }
 
-enum Wind {
+export enum Wind {
     East,
     South,
     West,
     North
 }
 
-enum Dragon {
+export enum Dragon {
     White,
     Green,
     Red

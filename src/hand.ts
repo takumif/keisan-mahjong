@@ -1,24 +1,23 @@
 import {Tile, Suit, TileType, Wind, Dragon} from "./tile"
 import {Meld, Pair, Triple, Straight, Quadruple} from "./meld"
 
-/*
 class Hand {
+    private melds: Meld[];
+    
     constructor(
-        private concealedCombinaisons: HandCombinaison[],
-        private openCombinaisons: HandCombinaison[],
-        private seatWind,
-        private roundWind,
-        private winningCombinaisonIndex,
-        private winningTileIndex,
-        private winningType,
-        private winningSecondType,
-        private doraTiles,
-        private uraDoraTiles
+        private closedMelds: Meld[],
+        private openMelds: Meld[],
+        private seatWind: Wind,
+        private roundWind: Wind,
+        private winningMeld: Meld,
+        private winningTile: Tile,
+        // private winType,
+        // private winSecondType,
+        private doraTiles: Tile[],
+        private uraDoraTiles: Tile[],
+        private riichiCount: number,
+        private ippatsu: boolean
     ) {
-        this.combinaisons = concealedCombinaisons.concat(this.openCombinaisons);
-        this.isRiichi = false;
-        this.isDoubleRiichi = false;
-        this.isIppatsu = false;
+        this.melds = this.closedMelds.concat(this.openMelds);
     }
 }
-*/

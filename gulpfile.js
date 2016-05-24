@@ -11,34 +11,37 @@ gulp.task("build", function () {
     var tsResult = tsProject
         .src()
         .pipe(ts(tsProject));
-    return merge([
+    merge([
         tsResult.dts.pipe(gulp.dest("dist")),
         tsResult.js.pipe(gulp.dest("dist"))
-    ])
+    ]);
 });
 
 gulp.task("typedoc", function() {
-    return gulp
+    gulp
         .src(["src/**/*.ts"])
         .pipe(typedoc({
             module: "commonjs",
             target: "es5",
             out: "docs/",
             name: "Riichi Mahjong"
-        }))
-    ;
+        }));
 });
 
 gulp.task("test", function() {
-    return gulp
-        .src([
-            "test/test-tile.js"
-        ])
-        .pipe(jasmine())
+    setTimeout(() => {
+        gulp
+            .src([
+                "test/test-tile.js",
+                "test/test-parser.js"
+            ])
+            .pipe(jasmine());
+    }, 100);
 });
 
 gulp.task("watch", function() {
     gulp.watch("src/**/*.ts", ["build", "typedoc"]);
 })
 
-gulp.task("default", ["build", "typedoc", "test"]);
+gulp.task("default", ["build", "test"]);
+gulp.task("all", ["build", "typedoc", "test"]);

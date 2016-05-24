@@ -2,14 +2,19 @@
 
 var gulp = require("gulp");
 var ts = require("gulp-typescript");
-var tsProject = ts.createProject("tsconfig.json");
 var typedoc = require("gulp-typedoc");
 var jasmine = require("gulp-jasmine");
+var merge = require("merge2");
 
-gulp.task("tsc", function () {
-    return tsProject.src()
-        .pipe(ts(tsProject))
-        .js.pipe(gulp.dest("dist"));
+gulp.task("build", function () {
+    var tsProject = ts.createProject("tsconfig.json", { declaration: true });
+    var tsResult = tsProject
+        .src()
+        .pipe(ts(tsProject));
+    return merge([
+        tsResult.dts.pipe(gulp.dest("dist")),
+        tsResult.js.pipe(gulp.dest("dist"))
+    ])
 });
 
 gulp.task("typedoc", function() {
@@ -33,7 +38,7 @@ gulp.task("test", function() {
 });
 
 gulp.task("watch", function() {
-    gulp.watch("src/**/*.ts", ["tsc", "typedoc"]);
+    gulp.watch("src/**/*.ts", ["build", "typedoc"]);
 })
 
-gulp.task("default", ["tsc", "typedoc", "test"]);
+gulp.task("default", ["build", "typedoc", "test"]);

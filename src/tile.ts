@@ -273,8 +273,8 @@ enum Suit {
 }
 
 enum TileType {
-    Number,
-    Honor
+    Number,     // Character, Circle or Bamboo
+    Honor       // Wind or Dragon
 }
 
 enum Wind {

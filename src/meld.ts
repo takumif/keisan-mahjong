@@ -2,6 +2,20 @@ import {Tile, Suit, TileType, Wind, Dragon} from "./tile"
 
 export abstract class Meld {
     tiles: Tile[];
+    suit: Suit;
+    
+    equals(other: Meld): boolean {
+        if (this.tiles.length !== other.tiles.length ||
+            this.suit !== other.suit) {
+            return false;
+        }
+        for (var i = 0; i < this.tiles.length; i++) {
+            if (!this.tiles[i].equals(other.tiles[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
     
     static hasOneOrSevenPairs(melds: Meld[]): boolean {
         var pairs = 0;
@@ -101,6 +115,7 @@ export class Pair extends Meld {
     constructor(tile: Tile) {
         super();
         this.tiles = [tile, tile];
+        this.suit = tile.suit;
     }
 }
 
@@ -108,6 +123,7 @@ export class Triple extends Meld {
     constructor(tile: Tile) {
         super();
         this.tiles = [tile, tile, tile];
+        this.suit = tile.suit;
     }
 }
 
@@ -123,6 +139,7 @@ export class Straight extends Meld {
             tile3 = tile2.nextNumber();
         }
         this.tiles = [tile1, tile2, tile3];
+        this.suit = tile1.suit;
     }
 }
 
@@ -130,5 +147,6 @@ export class Quadruple extends Meld {
     constructor(tile: Tile) {
         super();
         this.tiles = [tile, tile, tile, tile];
+        this.suit = tile.suit;
     }
 }

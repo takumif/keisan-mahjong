@@ -18,7 +18,8 @@ export class Hand {
         public riichi: boolean,
         public doubleRiichi: boolean,
         public ippatsu: boolean,
-        public winBonus: WinningTileBonus
+        public winBonus: WinningTileBonus,
+        public winningDraw: WinningDraw
     ) {
         this.melds = this.closedMelds.concat(this.openMelds);
     }

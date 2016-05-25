@@ -23,9 +23,11 @@
   "homepage": "https://github.com/takumif/keisan-mahjong#readme",
   "devDependencies": {
     "gulp": "^3.9.1",
+    "gulp-jasmine": "^2.3.0",
     "gulp-typedoc": "^2.0.0",
     "gulp-typescript": "^2.13.4",
     "jasmine": "^2.4.1",
+    "merge2": "^1.0.2",
     "typedoc": "^0.3.12"
   }
 }

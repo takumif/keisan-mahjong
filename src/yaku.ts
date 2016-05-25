@@ -50,7 +50,7 @@ class HalfFlush extends Yaku {
     
     static calculate(hand: Hand): number {
         var nbHonorTile = 0;
-        var suit = null;
+        var suit: Suit = null;
         for (var i = 0; i < hand.melds.length; i++) {
             for (var j = 0; j < hand.melds[i].tiles.length; j++) {
                 var tile = hand.melds[i].tiles[j];
@@ -89,7 +89,7 @@ class Chinitsu extends Yaku {
     static englishName = "Full Flush";
     
     static calculate(hand: Hand): number {
-        var suit = null;
+        var suit: Suit = null;
         for (var i = 0; i < hand.melds.length; i ++) {
             for (var j = 0; j < hand.melds[i].tiles.length; j++) {
                 var tile = hand.melds[i].tiles[j];
@@ -145,7 +145,7 @@ class Iipeikou extends Yaku {
     static calculate(hand: Hand): number {
         if (!hand.isClosed()) return 0;
         
-        var storedChiis = [];
+        var storedChiis: Straight[] = [];
         for (var i = 0; i < hand.melds.length; i++) {
             var meld = hand.melds[i];
             if (meld instanceof Straight) {
@@ -174,7 +174,8 @@ class SanShokuDoujun extends Yaku {
     static englishName = "Mixed Triple Chii";
     
     static calculate(hand: Hand): number {
-        var storedChiis = {};
+        /*
+        var storedChiis: {[id: number]: {[id: number]: number}} = {};
         for (var i = 0; i < hand.melds.length; i++) {
             var meld = hand.melds[i];
             if (meld instanceof Straight) {
@@ -197,6 +198,7 @@ class SanShokuDoujun extends Yaku {
                 }
             }
         }
+        */
         return 0;
     };
 }
@@ -213,7 +215,7 @@ class Itsu extends Yaku {
     static englishName = "Pure Straight";
     
     static calculate(hand: Hand): number {
-        var storedChiis = {};
+        var storedChiis: {[id: number]: {[id: number]: number}} = {};
         for (var i = 0; i < hand.melds.length; i++) {
             var meld = hand.melds[i];
             if (meld instanceof Straight) {
@@ -313,7 +315,7 @@ class SanShokuDokou extends Yaku {
     static englishName = "Triple Triple";
 
     static calculate(hand: Hand): number {
-        var storedTriples = {};
+        var storedTriples: {[id: number]: number} = {};
         for (var i = 0; i < hand.melds.length; i++) {
             var meld = hand.melds[i];
             if (meld instanceof Triple || meld instanceof Quadruple) {
@@ -397,7 +399,7 @@ class RyanPeikou extends Yaku {
     static englishName = "Twice Pure Double Chii";
     
     static calculate(hand: Hand): number {
-        var chiis = {};
+        var chiis: {[id: number]: number} = {};
         var nbPairOfChii = 0;
         for (var i = 0; i < hand.melds.length; i++) {
             var meld = hand.melds[i];

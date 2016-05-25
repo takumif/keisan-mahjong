@@ -1,8 +1,8 @@
 import {Tile, Suit, TileType, Wind, Dragon} from "./tile"
 import {Meld, Pair, Triple, Straight, Quadruple} from "./meld"
-import {Hand, WinningTileBonus, WinningDraw} from "./hand"
+import {Hand, WinningBonus, WinningMethod} from "./hand"
 
-abstract class Yaku {
+export abstract class Yaku {
     static japaneseName = "Japanese name not set";
     static englishName = "English name not set";
     
@@ -22,7 +22,7 @@ abstract class Yaku {
  * Must be closed : no (some rules say yes)
  * Han : 1
  */
-class AllSimples extends Yaku {
+export class AllSimples extends Yaku {
     static japaneseName = "Tanyao Chuu";
     static englishName = "All Simples";
     
@@ -30,7 +30,9 @@ class AllSimples extends Yaku {
         for (var i = 0; i < hand.melds.length; i++) {
             for (var j = 0; j < hand.melds[i].tiles.length; j++) {
                 var tile = hand.melds[i].tiles[j];
-                if (tile.type === TileType.Honor || tile.isTerminal()) return 0;
+                if (tile.type === TileType.Honor || tile.isTerminal()) {
+                    return 0;
+                }
             }
         }
         return 1;
@@ -44,7 +46,7 @@ class AllSimples extends Yaku {
  * Must be closed: no
  * Han: 3 (closed) / 2 (open)
  */
-class HalfFlush extends Yaku {
+export class HalfFlush extends Yaku {
     static japaneseName = "Hon Itsu";
     static englishName = "Half Flush";
     
@@ -84,7 +86,7 @@ class HalfFlush extends Yaku {
  * Must be closed: no
  * Han: 6 (closed) / 5 (open)
  */
-class Chinitsu extends Yaku {
+export class Chinitsu extends Yaku {
     static japaneseName = "Chinitsu";
     static englishName = "Full Flush";
     
@@ -116,7 +118,7 @@ class Chinitsu extends Yaku {
  * Must be closed: no
  * Han: 2
  */
-class Honroutou extends Yaku {
+export class Honroutou extends Yaku {
     static japaneseName = "Honroutou";
     static englishName = "All terminals & honors";
     
@@ -138,7 +140,7 @@ class Honroutou extends Yaku {
  * Must be closed: yes
  * Han: 1
  */
-class Iipeikou extends Yaku {
+export class Iipeikou extends Yaku {
     static japaneseName = "Iipeikou";
     static englishName = "Pure Double Chii";
     
@@ -169,7 +171,7 @@ class Iipeikou extends Yaku {
  * Must be closed: no
  * Han: 2 (closed) / 1 (open)
  */
-class SanShokuDoujun extends Yaku {
+export class SanShokuDoujun extends Yaku {
     static japaneseName = "San Shoku Doujun";
     static englishName = "Mixed Triple Chii";
     
@@ -210,7 +212,7 @@ class SanShokuDoujun extends Yaku {
  * Must be closed: no
  * Han: 2 (closed) / 1 (open)
  */
-class Itsu extends Yaku {
+export class Itsu extends Yaku {
     static japaneseName = "Itsu"; // can be call Ikkitsuukan
     static englishName = "Pure Straight";
     
@@ -249,7 +251,7 @@ class Itsu extends Yaku {
  * Must be closed: no
  * Han: 2 (closed) / 1 (open)
  */
-class Chanta extends Yaku {
+export class Chanta extends Yaku {
     static japaneseName = "Chanta";
     static englishName = "Outside Hand";
 
@@ -285,7 +287,7 @@ class Chanta extends Yaku {
  * Must be closed: yes
  * Han: 2
  */
-class ChiiToitsu extends Yaku {
+export class ChiiToitsu extends Yaku {
     static japaneseName = "Chii Toitsu";
     static englishName = "Seven Pairs";
 
@@ -310,7 +312,7 @@ class ChiiToitsu extends Yaku {
  * Must be closed: no
  * Han: 2
  */
-class SanShokuDokou extends Yaku {
+export class SanShokuDokou extends Yaku {
     static japaneseName = "San Shoku Dokou";
     static englishName = "Triple Triple";
 
@@ -338,7 +340,7 @@ class SanShokuDokou extends Yaku {
  * Must be closed: no
  * Han: 2
  */
-class ToiToiHou extends Yaku {
+export class ToiToiHou extends Yaku {
     static japaneseName = "Toi-Toi Hou";
     static englishName = "All Triple";
 
@@ -363,7 +365,7 @@ class ToiToiHou extends Yaku {
  * Must be closed: no
  * Han: 2
  */
-class ShouSangen extends Yaku {
+export class ShouSangen extends Yaku {
     static japaneseName = "Shou Sangen";
     static englishName = "Little Three Dragons";
 
@@ -394,7 +396,7 @@ class ShouSangen extends Yaku {
  * Han: 3
  *
  */
-class RyanPeikou extends Yaku {
+export class RyanPeikou extends Yaku {
     static japaneseName = "Ryan Peikou";
     static englishName = "Twice Pure Double Chii";
     
@@ -428,7 +430,7 @@ class RyanPeikou extends Yaku {
  * Must be closed: no
  * Han: 3 (closed) / 2 (open)
  */
-class JunchanTaiyai extends Yaku {
+export class JunchanTaiyai extends Yaku {
     static japaneseName = "Junchan Taiyai"; // can also be call Junchan Tayao or Junchan
     static englishName = "Terminals in all sets";
     
@@ -459,7 +461,7 @@ class JunchanTaiyai extends Yaku {
  * Must be closed: no
  * Han: 1
  */
-class FanpaiSeatWind extends Yaku {
+export class FanpaiSeatWind extends Yaku {
     static japaneseName = "Fanpai";
     static englishName = "Seat Wind";
     
@@ -482,7 +484,7 @@ class FanpaiSeatWind extends Yaku {
  * Must be closed: no
  * Han: 1
  */
-class FanpaiRoundWind extends Yaku {
+export class FanpaiRoundWind extends Yaku {
     static japaneseName = "Fanpai";
     static englishName = "Round Wind";
     
@@ -505,7 +507,7 @@ class FanpaiRoundWind extends Yaku {
  * Must be closed: no
  * Han: 1
  */
-class FanpaiDragonTriple extends Yaku {
+export class FanpaiDragonTriple extends Yaku {
     static japaneseName = "Fanpai";
     static englishName = "Dragon Triple";
     
@@ -529,7 +531,7 @@ class FanpaiDragonTriple extends Yaku {
  * Must be closed: yes
  * Han: 1
  */
-class Pinfu extends Yaku {
+export class Pinfu extends Yaku {
     static japaneseName = "Pinfu";
     static englishName = "All Chii / No points";
     
@@ -564,7 +566,7 @@ class Pinfu extends Yaku {
  * Must be closed: no
  * Han: 2
  */
-class SanAnkou extends Yaku {
+export class SanAnkou extends Yaku {
     static japaneseName = "San Ankou";
     static englishName = "3 closed pons";
     
@@ -592,7 +594,7 @@ class SanAnkou extends Yaku {
  * Must be closed: no
  * Han: 2
  */
-class SanQuadrupleTsu extends Yaku {
+export class SanQuadrupleTsu extends Yaku {
     static japaneseName = "San Quadruple Tsu";
     static englishName = "3 kans";
     
@@ -619,12 +621,12 @@ class SanQuadrupleTsu extends Yaku {
  * Must be closed: yes
  * Han: 1
  */
-class MenzenTsumo extends Yaku {
+export class MenzenTsumo extends Yaku {
     static japaneseName = "Menzen Tsumo";
     static englishName = "Fully closed Hand";
     
     static calculate(hand: Hand): number {
-        if (hand.winningDraw === WinningDraw.Tsumo && hand.isClosed()) {
+        if (hand.winMethod === WinningMethod.Tsumo && hand.isClosed()) {
             return 1;
         }
         return 0;
@@ -638,12 +640,13 @@ class MenzenTsumo extends Yaku {
  * Must be closed: yes
  * Han: 1
  */
-class Riichi extends Yaku {
+export class Riichi extends Yaku {
     static japaneseName = "Riichi";
     static englishName = "Riichi";
     
     static calculate(hand: Hand): number {
-        if (hand.riichi) {
+        if (hand.hasBonus(WinningBonus.Riichi) ||
+            hand.hasBonus(WinningBonus.DoubleRiichi)) {
             return 1;
         }
         return 0;
@@ -657,12 +660,12 @@ class Riichi extends Yaku {
  * Must be closed: yes
  * Han: 1
  */
-class DoubleRiichi extends Yaku {
+export class DoubleRiichi extends Yaku {
     static japaneseName = "Double Riichi";
     static englishName = "Double Riichi";
     
     static calculate(hand: Hand): number {
-        if (hand.doubleRiichi) {
+        if (hand.hasBonus(WinningBonus.DoubleRiichi)) {
             return 1;
         }
         return 0;
@@ -676,12 +679,12 @@ class DoubleRiichi extends Yaku {
  * Must be closed: yes
  * Han: 1
  */
-class Ippatsu extends Yaku {
+export class Ippatsu extends Yaku {
     static japaneseName = "Ippatsu";
     static englishName = "One Shot";
     
     static calculate(hand: Hand): number {
-        if (hand.ippatsu) {
+        if (hand.hasBonus(WinningBonus.Ippatsu)) {
             return 1;
         }
         return 0;
@@ -695,12 +698,12 @@ class Ippatsu extends Yaku {
  * Must be closed: no
  * Han: 1
  */
-class HaiteiRaoyue extends Yaku {
+export class HaiteiRaoyue extends Yaku {
     static japaneseName = "Haitei Raoyue";
     static englishName = "Last Tile Draw";
     
     static calculate(hand: Hand): number {
-        if (hand.winningDraw === WinningDraw.Tsumo && hand.winBonus === WinningTileBonus.LastFromWall) {
+        if (hand.winMethod === WinningMethod.Tsumo && hand.hasBonus(WinningBonus.LastFromWall)) {
             return 1;
         }
         return 0;
@@ -714,12 +717,12 @@ class HaiteiRaoyue extends Yaku {
  * Must be closed: no
  * Han: 1
  */
-class HouteiRaoyui extends Yaku {
+export class HouteiRaoyui extends Yaku {
     static japaneseName = "Houtei Raoyui";
     static englishName = "Last Tile Discard";
     
     static calculate(hand: Hand): number {
-        if (hand.winningDraw === WinningDraw.Ron && hand.winBonus === WinningTileBonus.LastDiscard) {
+        if (hand.winMethod === WinningMethod.Ron && hand.hasBonus(WinningBonus.LastDiscard)) {
             return 1;
         }
         return 0;
@@ -733,12 +736,12 @@ class HouteiRaoyui extends Yaku {
  * Must be closed: no
  * Han: 1
  */
-class RinshanKaihou extends Yaku {
+export class RinshanKaihou extends Yaku {
     static japaneseName = "Rinshan Kaihou";
     static englishName = "After kan";
     
     static calculate(hand: Hand): number {
-        if (hand.winningDraw === WinningDraw.Tsumo && hand.winBonus === WinningTileBonus.DeadWallDraw) {
+        if (hand.winMethod === WinningMethod.Tsumo && hand.hasBonus(WinningBonus.DeadWallDraw)) {
             return 1;
         }
         return 0;
@@ -752,12 +755,12 @@ class RinshanKaihou extends Yaku {
  * Must be closed: no
  * Han: 1
  */
-class ChanQuadruple extends Yaku {
+export class ChanQuadruple extends Yaku {
     static japaneseName = "Chan Quadruple";
     static englishName = "Robbing the kan";
     
     static calculate(hand: Hand): number {
-        if (hand.winningDraw === WinningDraw.Ron && hand.winBonus === WinningTileBonus.QuadrupleRob) {
+        if (hand.winMethod === WinningMethod.Ron && hand.hasBonus(WinningBonus.QuadrupleRob)) {
             return 1;
         }
         return 0;
@@ -770,7 +773,7 @@ class ChanQuadruple extends Yaku {
  * Must be closed: no
  * Han: 1 / dora
  */
-class Dora extends Yaku {
+export class Dora extends Yaku {
     static japaneseName = "Dora";
     static englishName = "Dora";
     
@@ -801,12 +804,15 @@ class Dora extends Yaku {
  * Must be closed: no
  * Han: 1 / ura-dora
  */
-class UraDora extends Yaku {
+export class UraDora extends Yaku {
     static japaneseName = "Ura-Dora";
     static englishName = "Ura-Dora";
     
     static calculate(hand: Hand): number {
-        if (!hand.riichi) return 0;
+        if (!hand.hasBonus(WinningBonus.Riichi) &&
+            !hand.hasBonus(WinningBonus.DoubleRiichi)) {
+            return 0;
+        }
     
         var points = 0;
         

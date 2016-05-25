@@ -51,28 +51,21 @@ export class HalfFlush extends Yaku {
     static englishName = "Half Flush";
     
     static calculate(hand: Hand): number {
-        var nbHonorTile = 0;
+        var hasHonorTiles = false;
         var suit: Suit = null;
-        for (var i = 0; i < hand.melds.length; i++) {
-            for (var j = 0; j < hand.melds[i].tiles.length; j++) {
-                var tile = hand.melds[i].tiles[j];
-                if (tile.type === TileType.Honor) {
-                    nbHonorTile++;
-                } else {
-                    if (suit == null) {
-                        suit = tile.suit;
-                    } else if (suit != tile.suit) {
-                        return 0;
-                    }
+        hand.melds.forEach((meld, i, _) => {
+            if (meld.suit === Suit.Wind || meld.suit === Suit.Dragon) {
+                hasHonorTiles = true;
+            } else {
+                if (suit === null) {
+                    suit = meld.suit;
+                } else if (meld.suit !== suit) {
+                    return 0;
                 }
             }
-        }
-        if (nbHonorTile > 0) {
-            if (!hand.isClosed()) {
-                return 2;
-            } else {
-                return 3;
-            }
+        });
+        if (hasHonorTiles) {
+            return hand.plusOneIfClosed(2);
         } else {
             return 0;
         }
@@ -86,28 +79,21 @@ export class HalfFlush extends Yaku {
  * Must be closed: no
  * Han: 6 (closed) / 5 (open)
  */
-export class Chinitsu extends Yaku {
+export class FullFlush extends Yaku {
     static japaneseName = "Chinitsu";
     static englishName = "Full Flush";
     
     static calculate(hand: Hand): number {
         var suit: Suit = null;
-        for (var i = 0; i < hand.melds.length; i ++) {
-            for (var j = 0; j < hand.melds[i].tiles.length; j++) {
-                var tile = hand.melds[i].tiles[j];
-                if (tile.type === TileType.Honor) return 0;
-                if (suit === null) {
-                    suit = tile.suit;
-                } else if (suit !== tile.suit) {
-                    return 0;
-                }
+        hand.melds.forEach((meld, i, _) => {
+            var meld = hand.melds[i];
+            if (suit === null) {
+                suit = meld.suit;
+            } else if (meld.suit !== suit) {
+                return 0;
             }
-        }
-        if (hand.isClosed()) {
-            return 6;
-        } else {
-            return 5;
-        }
+        });
+        return hand.plusOneIfClosed(5);
     };
 }
 
@@ -118,17 +104,16 @@ export class Chinitsu extends Yaku {
  * Must be closed: no
  * Han: 2
  */
-export class Honroutou extends Yaku {
+export class TerminalsAndHonors extends Yaku {
     static japaneseName = "Honroutou";
     static englishName = "All terminals & honors";
     
     static calculate(hand: Hand): number {
-        for (var i = 0; i < hand.melds.length; i ++) {
-            for (var j = 0; j < hand.melds[i].tiles.length; j++) {
-                var tile = hand.melds[i].tiles[j];
-                if (! (tile.type === TileType.Honor || tile.isTerminal())) return 0; 
+        hand.tiles.forEach((tile, i, _) => {
+            if (!(tile.type === TileType.Honor || tile.isTerminal())) {
+                return 0;
             }
-        }
+        })
         return 2;
     };
 }
@@ -142,10 +127,12 @@ export class Honroutou extends Yaku {
  */
 export class Iipeikou extends Yaku {
     static japaneseName = "Iipeikou";
-    static englishName = "Pure Double Chii";
+    static englishName = "Pure Double Straight";
     
     static calculate(hand: Hand): number {
-        if (!hand.isClosed()) return 0;
+        if (!hand.isClosed()) {
+            return 0;
+        }
         
         var storedChiis: Straight[] = [];
         for (var i = 0; i < hand.melds.length; i++) {
@@ -212,31 +199,27 @@ export class SanShokuDoujun extends Yaku {
  * Must be closed: no
  * Han: 2 (closed) / 1 (open)
  */
-export class Itsu extends Yaku {
-    static japaneseName = "Itsu"; // can be call Ikkitsuukan
+export class PureStraight extends Yaku {
+    static japaneseName = "Ikkitsuukan";
     static englishName = "Pure Straight";
     
     static calculate(hand: Hand): number {
-        var storedChiis: {[id: number]: {[id: number]: number}} = {};
+        var storedChiis: {[id: number]: {[id: number]: boolean}} = {};
         for (var i = 0; i < hand.melds.length; i++) {
             var meld = hand.melds[i];
             if (meld instanceof Straight) {
                 var tile = meld.tiles[0];
                 
-                if (storedChiis[tile.suit] == undefined) {
-                    storedChiis[tile.suit] = {1: 0, 4: 0, 7: 0};
+                if (storedChiis[tile.suit] === undefined) {
+                    storedChiis[tile.suit] = {1: false, 4: false, 7: false};
                 }
                 
                 var chii = storedChiis[tile.suit];
                 
-                chii[tile.value]++;
+                chii[tile.value] = true;
                 
                 if (chii[1] && chii[4] && chii[7]) {
-                    if (!hand.isClosed()) {
-                        return 1;
-                    } else {
-                        return 2;
-                    }
+                    return hand.plusOneIfClosed(1);
                 }
             }
         }
@@ -767,34 +750,34 @@ export class ChanQuadruple extends Yaku {
     };
 }
 
+export abstract class AbstractDora extends Yaku {
+    static calculateDoraPoints(doraTiles: Tile[], tiles: Tile[]): number {
+        var points = 0;
+        doraTiles.forEach((doraTile, i, _) => {
+            var tileAfterDora = doraTile.nextWithWrapAround();
+            tiles.forEach((tile, j, _) => {
+                if (tile.equals(tileAfterDora)) {
+                    points++;
+                }
+            });
+        });
+        
+        return points;
+    }
+}
+
 /**
  * Dora yaku pattern
  * 
  * Must be closed: no
  * Han: 1 / dora
  */
-export class Dora extends Yaku {
+export class Dora extends AbstractDora {
     static japaneseName = "Dora";
     static englishName = "Dora";
     
     static calculate(hand: Hand): number {
-        var points = 0;
-        
-        for (var i = 0; i < hand.dora.length; i++) {
-            var doraTile = hand.dora[i];
-            var tileAfterDora = doraTile.nextWithWrapAround();
-            
-            for (var j = 0; j < hand.melds.length; j++) {
-                for (var k = 0; k < hand.melds[j].tiles.length; k++) {
-                    var tile = hand.melds[j].tiles[k];
-                    if (tile.equals(tileAfterDora)) {
-                        points++;
-                    }
-                }
-            }
-        }
-        
-        return points;
+        return Dora.calculateDoraPoints(hand.dora, hand.tiles);
     };
 }
 
@@ -804,7 +787,7 @@ export class Dora extends Yaku {
  * Must be closed: no
  * Han: 1 / ura-dora
  */
-export class UraDora extends Yaku {
+export class UraDora extends AbstractDora {
     static japaneseName = "Ura-Dora";
     static englishName = "Ura-Dora";
     
@@ -813,23 +796,6 @@ export class UraDora extends Yaku {
             !hand.hasBonus(WinningBonus.DoubleRiichi)) {
             return 0;
         }
-    
-        var points = 0;
-        
-        for (var i = 0; i < hand.uraDora.length; i++) {
-            var doraTile = hand.uraDora[i];
-            var tileAfterDora = doraTile.nextWithWrapAround();
-            
-            for (var j = 0; j < hand.melds.length; j++) {
-                for (var k = 0; k < hand.melds[j].tiles.length; k++) {
-                    var tile = hand.melds[j].tiles[k];
-                    if (tile.equals(tileAfterDora)) {
-                        points++;
-                    }
-                }
-            }
-        }
-        
-        return points;
+        return UraDora.calculateDoraPoints(hand.uraDora, hand.tiles);
     };
 }

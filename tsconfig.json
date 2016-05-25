@@ -3,7 +3,8 @@
         "src/hand.ts",
         "src/meld.ts",
         "src/parser.ts",
-        "src/tile.ts"
+        "src/tile.ts",
+        "src/yaku.ts"
     ],
     "compilerOptions": {
         "noImplicitAny": true,

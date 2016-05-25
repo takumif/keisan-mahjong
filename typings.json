@@ -1,5 +1,5 @@
 {
-  "name": "riichi-mahjong",
+  "name": "keisan-mahjong",
   "dependencies": {
     "gulp": "registry:npm/gulp#3.8.0+20160211003958"
   },

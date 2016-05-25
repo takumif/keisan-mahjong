@@ -1,14 +1,14 @@
 {
-  "name": "riichi-mahjong",
+  "name": "keisan-mahjong",
   "version": "0.0.1",
-  "description": "A library for playing and scoring riichi (Japanese) mahjong",
+  "description": "A library for calculating Riichi (Japanese) Mahjong scores",
   "main": "dist/mahjong.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/takumif/riichi-mahjong.git"
+    "url": "git+https://github.com/takumif/keisan-mahjong.git"
   },
   "keywords": [
     "mahjong",
@@ -18,9 +18,9 @@
   "author": "Takumi Fujimoto",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/takumif/riichi-mahjong/issues"
+    "url": "https://github.com/takumif/keisan-mahjong/issues"
   },
-  "homepage": "https://github.com/takumif/riichi-mahjong#readme",
+  "homepage": "https://github.com/takumif/keisan-mahjong#readme",
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-typedoc": "^2.0.0",

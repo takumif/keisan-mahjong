@@ -32,8 +32,11 @@ gulp.task("test", function() {
     setTimeout(() => {
         gulp
             .src([
+                "test/test-hand.js",
+                "test/test-meld.js",
+                "test/test-parser.js",
                 "test/test-tile.js",
-                "test/test-parser.js"
+                "test/test-yaku.js"
             ])
             .pipe(jasmine());
     }, 100);

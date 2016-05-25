@@ -13,15 +13,15 @@ var U = require("./util");
 describe("Parser.parseHand", () => {
     it("can parse a hand", () => {
         var text =
-            "closed: [w3, w4, w5, s7, s7, s7, s8, s8],\
-            open: [s, s, s, red, red, red],\
-            seat: e,\
-            round: s,\
-            win: s7,\
-            dora: [s5],\
-            ura dora: [],\
-            riichi count: 0,\
-            ippatsu: no";
+            "closed:        [w3, w4, w5, s7, s7, s7, s8, s8],\
+             open:          [s, s, s, red, red, red],\
+             seat:          e,\
+             round:         s,\
+             win:           s7,\
+             dora:          [s5],\
+             ura dora:      [],\
+             riichi count:  0,\
+             ippatsu:       no";
         expect(Parser.parseHand(text)).toEqual(new Hand([
                 new Straight(U.w3, U.w4, U.w5),
                 new Triple(U.s7, U.s7, U.s7),
@@ -63,4 +63,8 @@ describe("Parser.parseTile", () => {
         expect(() => { Parser.parseTile("") }).toThrow();
         expect(() => {Parser.parseTile("asdf1") }).toThrow();
     });
+});
+
+describe("Parser.exportTile", () => {
+    
 });

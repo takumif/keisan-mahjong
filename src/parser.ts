@@ -4,7 +4,7 @@ import {Hand} from "./hand"
 
 export class Parser {
     static parseHand(text: string): Hand {
-        throw "";
+        throw "unimplemented";
     }
     
     static parseTiles(text: string): Tile[] {
@@ -23,6 +23,18 @@ export class Parser {
         } else {
             return Parser.parseNumberTile(text.substring(0, text.length - 1), num);
         }
+    }
+    
+    static exportHand(hand: Hand): string {
+        throw "unimplemented";
+    }
+    
+    static exportMelds(melds: Meld[]): string {
+        throw "unimplemented";
+    }
+    
+    static exportTile(tile: Tile): string {
+        throw "unimplemented";
     }
     
     private static parseHonorTile(text: string): Tile {

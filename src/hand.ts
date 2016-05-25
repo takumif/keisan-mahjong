@@ -1,23 +1,54 @@
 import {Tile, Suit, TileType, Wind, Dragon} from "./tile"
 import {Meld, Pair, Triple, Straight, Quadruple} from "./meld"
 
-class Hand {
-    private melds: Meld[];
+export class Hand {
+    public melds: Meld[];
     
     constructor(
-        private closedMelds: Meld[],
-        private openMelds: Meld[],
-        private seatWind: Wind,
-        private roundWind: Wind,
-        private winningMeld: Meld,
-        private winningTile: Tile,
+        public closedMelds: Meld[],
+        public openMelds: Meld[],
+        public seatWind: Wind,
+        public roundWind: Wind,
+        // private winningMeld: Meld,
+        public winningTile: Tile,
         // private winType,
         // private winSecondType,
-        private doraTiles: Tile[],
-        private uraDoraTiles: Tile[],
-        private riichiCount: number,
-        private ippatsu: boolean
+        public dora: Tile[],
+        public uraDora: Tile[],
+        public riichi: boolean,
+        public doubleRiichi: boolean,
+        public ippatsu: boolean,
+        public winBonus: WinningTileBonus
     ) {
         this.melds = this.closedMelds.concat(this.openMelds);
     }
+    
+    isClosed(): boolean {
+        return this.openMelds.length === 0;
+    }
+    
+    isEdgeWait(): boolean {
+        throw "unimplemented";
+    }
+    
+    isClosedWait(): boolean {
+        throw "unimplemented";
+    }
+    
+    isSingleWait(): boolean {
+        throw "unimplemented";
+    }
+}
+
+export enum WinningTileBonus {
+    None,
+    QuadrupleRob,
+    LastFromWall,
+    LastDiscard,
+    DeadWallDraw
+}
+
+export enum WinningDraw {
+    Tsumo, // self-draw
+    Ron // taking a discard
 }

@@ -36,7 +36,7 @@ export class AllSimples extends Yaku {
             }
         }
         return 1;
-    };
+    }
 }
 
 /**
@@ -94,7 +94,7 @@ export class FullFlush extends Yaku {
             }
         });
         return hand.plusOneIfClosed(5);
-    };
+    }
 }
 
 /**
@@ -115,7 +115,7 @@ export class TerminalsAndHonors extends Yaku {
             }
         })
         return 2;
-    };
+    }
 }
 
 /**
@@ -148,7 +148,7 @@ export class Iipeikou extends Yaku {
             }
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -189,7 +189,7 @@ export class SanShokuDoujun extends Yaku {
         }
         */
         return 0;
-    };
+    }
 }
 
 /**
@@ -224,7 +224,7 @@ export class PureStraight extends Yaku {
             }
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -270,21 +270,20 @@ export class Chanta extends Yaku {
  * Must be closed: yes
  * Han: 2
  */
-export class ChiiToitsu extends Yaku {
+export class SevenPairs extends Yaku {
     static japaneseName = "Chii Toitsu";
     static englishName = "Seven Pairs";
 
     static calculate(hand: Hand): number {
-        var nbPair = 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof Pair) nbPair++;
-        }
-        if (nbPair === 7) {
-            return 2;
-        } else {
+        if (hand.closedMelds.length !== 7) {
             return 0;
         }
+        hand.closedMelds.forEach((meld, i, _) => {
+            if (!(meld instanceof Pair)) {
+                return 0;
+            }
+        });
+        return 2;
     }
 }
 
@@ -338,7 +337,7 @@ export class ToiToiHou extends Yaku {
         } else {
             return 0;
         }
-    };
+    }
 }
 
 /**
@@ -368,7 +367,7 @@ export class ShouSangen extends Yaku {
         } else {
             return 0;
         }
-    };
+    }
 }
 
 /**
@@ -403,7 +402,7 @@ export class RyanPeikou extends Yaku {
         }
         
         return 0;
-    };
+    }
 }
 
 /**
@@ -434,7 +433,7 @@ export class JunchanTaiyai extends Yaku {
         } else {
             return 0;
         }
-    };
+    }
 }
 
 /**
@@ -457,7 +456,7 @@ export class FanpaiSeatWind extends Yaku {
             }
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -480,7 +479,7 @@ export class FanpaiRoundWind extends Yaku {
             }
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -503,7 +502,7 @@ export class FanpaiDragonTriple extends Yaku {
             }
         }
         return nbDragonTriple;
-    };
+    }
 }
 
 /**
@@ -528,18 +527,17 @@ export class Pinfu extends Yaku {
             var meld = hand.melds[i];
             
             if (meld instanceof Pair) {
-                if (meld.tiles[0].suit === Suit.Dragon) return 0;
-                if (meld.tiles[0].suit === Suit.Wind) {
+                if (meld.suit === Suit.Dragon) return 0;
+                if (meld.suit === Suit.Wind) {
                     if (meld.tiles[0].value === hand.seatWind) return 0;
                     if (meld.tiles[0].value === hand.roundWind) return 0;
                 }
             }
-            
             if (meld instanceof Triple || meld instanceof Quadruple) return 0;
         }
         
         return 1;
-    };
+    }
 }
 
 /**
@@ -549,52 +547,51 @@ export class Pinfu extends Yaku {
  * Must be closed: no
  * Han: 2
  */
-export class SanAnkou extends Yaku {
+export class ThreeClosedTriples extends Yaku {
     static japaneseName = "San Ankou";
     static englishName = "3 closed pons";
     
     static calculate(hand: Hand): number {
-        var nbclosedTriple = 0;
+        var count = 0;
         
-        for (var i = 0; i < hand.closedMelds.length; i++) {
-            var meld = hand.closedMelds[i];
+        hand.closedMelds.forEach((meld, i, _) => {
             if (meld instanceof Triple || meld instanceof Quadruple) {
-                nbclosedTriple++;
+                count++;
             }
-        }
+        });
         
-        if (nbclosedTriple >= 3) {
+        if (count >= 3) {
             return 2;
         }
         return 0;
-    };
+    }
 }
 
 /**
- * San Quadruple Tsu (3 kans) yaku pattern
+ * San Kan Tsu (3 kans) yaku pattern
  * A hand with three kans.
  *
  * Must be closed: no
  * Han: 2
  */
-export class SanQuadrupleTsu extends Yaku {
-    static japaneseName = "San Quadruple Tsu";
+export class ThreeQuadruples extends Yaku {
+    static japaneseName = "San Kan Tsu";
     static englishName = "3 kans";
     
     static calculate(hand: Hand): number {
-        var nbQuadruple = 0;
+        var quadruples = 0;
         
-        for (var i = 0; i < hand.melds.length; i++) {
-            if (hand.melds[i] instanceof Quadruple) {
-                nbQuadruple++;
+        hand.melds.forEach((meld, i, _) => {
+            if (meld instanceof Quadruple) {
+                quadruples++;
             }
-        }
+        });
         
-        if (nbQuadruple >= 3) {
+        if (quadruples >= 3) {
             return 2;
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -613,7 +610,7 @@ export class MenzenTsumo extends Yaku {
             return 1;
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -633,7 +630,7 @@ export class Riichi extends Yaku {
             return 1;
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -652,7 +649,7 @@ export class DoubleRiichi extends Yaku {
             return 1;
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -671,7 +668,7 @@ export class Ippatsu extends Yaku {
             return 1;
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -690,7 +687,7 @@ export class HaiteiRaoyue extends Yaku {
             return 1;
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -709,7 +706,7 @@ export class HouteiRaoyui extends Yaku {
             return 1;
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -728,7 +725,7 @@ export class RinshanKaihou extends Yaku {
             return 1;
         }
         return 0;
-    };
+    }
 }
 
 /**
@@ -747,7 +744,7 @@ export class ChanQuadruple extends Yaku {
             return 1;
         }
         return 0;
-    };
+    }
 }
 
 export abstract class AbstractDora extends Yaku {
@@ -778,7 +775,7 @@ export class Dora extends AbstractDora {
     
     static calculate(hand: Hand): number {
         return Dora.calculateDoraPoints(hand.dora, hand.tiles);
-    };
+    }
 }
 
 /**
@@ -797,5 +794,5 @@ export class UraDora extends AbstractDora {
             return 0;
         }
         return UraDora.calculateDoraPoints(hand.uraDora, hand.tiles);
-    };
+    }
 }

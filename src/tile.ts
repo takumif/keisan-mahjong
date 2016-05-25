@@ -167,7 +167,7 @@ export class Tile {
             if (!tiles[i].equals(tiles[i + 1])) {
                 return null;
             }
-            pairs.push(new Pair(tiles[i], tiles[i + 1]));
+            pairs.push(new Pair(tiles[i]));
         }
         return pairs;
     }

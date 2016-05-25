@@ -5,6 +5,20 @@ export declare class Tile {
     value: number | Wind | Dragon;
     constructor(suit: Suit, value: number | Wind | Dragon);
     /**
+     * Returns null if the tile is a 9 or an honor tile
+     */
+    nextNumber(): Tile;
+    /**
+     * Can be used for determining the dora
+     */
+    nextWithWrapAround(): Tile;
+    /**
+     * True iff the tile is 1 or 9
+     */
+    isTerminal(): boolean;
+    equals(other: Tile): boolean;
+    toString(): string;
+    /**
      * Use this when sorting
      */
     static compare(tile1: Tile, tile2: Tile): number;
@@ -29,19 +43,11 @@ export declare class Tile {
     static formSevenPairs(tiles: Tile[]): Pair[];
     /**
      * Returns a list of possible ways to form melds with the given tiles.
-     * We assume that the tiles are closed, and hence there are no quadruples.
-     * An empty list if no melds can be formed.
+     * We assume that the tiles are closed, and hence there are no quadruples,
+     * and there should be one to five melds (one of which a pair), or seven pairs.
+     * An empty list is returned if all combinations end up with leftover tiles.
      */
     static formMelds(tiles: Tile[]): Meld[][];
-    equals(other: Tile): boolean;
-    /**
-     * Returns null if the tile is a 9 or an honor tile
-     */
-    nextNumber(): Tile;
-    /**
-     * Can be used for determining the dora
-     */
-    nextWithWrapAround(): Tile;
     /**
      * Requires that the tiles are sorted.
      */

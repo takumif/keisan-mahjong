@@ -1,4 +1,4 @@
-/// <reference path="tile.ts" />
+"use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -18,6 +18,7 @@ var Meld = (function () {
     };
     return Meld;
 }());
+exports.Meld = Meld;
 var Pair = (function (_super) {
     __extends(Pair, _super);
     function Pair(tile1, tile2) {
@@ -26,6 +27,7 @@ var Pair = (function (_super) {
     }
     return Pair;
 }(Meld));
+exports.Pair = Pair;
 var Triple = (function (_super) {
     __extends(Triple, _super);
     function Triple(tile1, tile2, tile3) {
@@ -34,6 +36,7 @@ var Triple = (function (_super) {
     }
     return Triple;
 }(Meld));
+exports.Triple = Triple;
 var Straight = (function (_super) {
     __extends(Straight, _super);
     function Straight(tile1, tile2, tile3) {
@@ -42,6 +45,7 @@ var Straight = (function (_super) {
     }
     return Straight;
 }(Meld));
+exports.Straight = Straight;
 var Quadruple = (function (_super) {
     __extends(Quadruple, _super);
     function Quadruple(tile1, tile2, tile3, tile4) {
@@ -50,3 +54,4 @@ var Quadruple = (function (_super) {
     }
     return Quadruple;
 }(Meld));
+exports.Quadruple = Quadruple;

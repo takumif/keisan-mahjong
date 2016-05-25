@@ -58,7 +58,7 @@ export abstract class Meld {
         if (tiles.length < 2 || !tiles[0].equals(tiles[1])) {
             return [];
         }
-        var pair = new Pair(tiles[0], tiles[1]);
+        var pair = new Pair(tiles[0]);
         return Meld.formMeldsWithSortedTiles(tiles.slice(2)).map((melds, i, a) => {
             return [pair].concat(melds);
         });
@@ -71,7 +71,7 @@ export abstract class Meld {
         if (tiles.length < 3 || !tiles[0].equals(tiles[1]) || !tiles[0].equals(tiles[2])) {
             return [];
         }
-        var triple = new Triple(tiles[0], tiles[1], tiles[2]);
+        var triple = new Triple(tiles[0]);
         return Meld.formMeldsWithSortedTiles(tiles.slice(3)).map((melds, i, a) => {
             return [triple].concat(melds);
         });
@@ -98,29 +98,37 @@ export abstract class Meld {
 export class Pair extends Meld {
     tiles: Tile[];
     
-    constructor(tile1: Tile, tile2: Tile) {
+    constructor(tile: Tile) {
         super();
-        this.tiles = [tile1, tile2];
+        this.tiles = [tile, tile];
     }
 }
 
 export class Triple extends Meld {
-    constructor(tile1: Tile, tile2: Tile, tile3: Tile) {
+    constructor(tile: Tile) {
         super();
-        this.tiles = [tile1, tile2, tile3];
+        this.tiles = [tile, tile, tile];
     }
 }
 
 export class Straight extends Meld {
-    constructor(tile1: Tile, tile2: Tile, tile3: Tile) {
+    /**
+     * You can either pass in the smallest tile, or all three tiles
+     * as the arguments. They'd have the same effect
+     */
+    constructor(tile1: Tile, tile2?: Tile, tile3?: Tile) {
         super();
+        if (tile2 === undefined) {
+            tile2 = tile1.nextNumber();
+            tile3 = tile2.nextNumber();
+        }
         this.tiles = [tile1, tile2, tile3];
     }
 }
 
 export class Quadruple extends Meld {
-    constructor(tile1: Tile, tile2: Tile, tile3: Tile, tile4: Tile) {
+    constructor(tile: Tile) {
         super();
-        this.tiles = [tile1, tile2, tile3, tile4];
+        this.tiles = [tile, tile, tile, tile];
     }
 }

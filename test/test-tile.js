@@ -95,13 +95,20 @@ describe("The Tile class", () => {
         expect(Tile.formMelds(sevenPairTiles)[0].length).toEqual(7);
     });
     
-    it("can get ibeikou right (formMelds)", () => {
+    it("can get ibeikou right, and give back melds in the right order (formMelds)", () => {
         var melds = Tile.formMelds(ibeikou);
         expect(melds.length).toBeGreaterThan(0);
         expect(melds[0]).toContain(new Straight(w1, w2, w3));
         expect(melds[0]).toContain(new Triple(s3, s3_2, s3_3));
         expect(melds[0].length).toEqual(5);
-    })
+        expect(melds[0]).toEqual([
+            new Straight(w1, w2, w3),
+            new Straight(w1, w2, w3),
+            new Triple(w9, w9, w9),
+            new Triple(s3, s3, s3),
+            new Pair(east, east)
+        ]);
+    });
     
     it("can recognize a straight (extractStraight)", () => {
         var result = Tile.extractStraight([w1, w2, w3], w1);

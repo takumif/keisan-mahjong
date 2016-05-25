@@ -30,6 +30,7 @@ You might need to do `npm install -g typings` before that.
 * Implement Hand methods
 * Implement Parser methods
 * Implement Tile methods
+* Check if honroutou doesn't overlap with other yaku
 
 ---
 

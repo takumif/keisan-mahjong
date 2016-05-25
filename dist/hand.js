@@ -1,24 +1,17 @@
 "use strict";
 var Hand = (function () {
-    function Hand(closedMelds, openMelds, seatWind, roundWind, 
-        // private winningMeld: Meld,
-        winningTile, 
-        // private winType,
-        // private winSecondType,
-        dora, uraDora, riichi, doubleRiichi, ippatsu, winBonus, winningDraw) {
+    function Hand(closedMelds, openMelds, info) {
         this.closedMelds = closedMelds;
         this.openMelds = openMelds;
-        this.seatWind = seatWind;
-        this.roundWind = roundWind;
-        this.winningTile = winningTile;
-        this.dora = dora;
-        this.uraDora = uraDora;
-        this.riichi = riichi;
-        this.doubleRiichi = doubleRiichi;
-        this.ippatsu = ippatsu;
-        this.winBonus = winBonus;
-        this.winningDraw = winningDraw;
         this.melds = this.closedMelds.concat(this.openMelds);
+        this.tiles = this.getTiles();
+        this.seatWind = info.seatWind;
+        this.roundWind = info.roundWind;
+        this.winningTile = info.winningTile;
+        this.dora = info.dora;
+        this.uraDora = info.uraDora;
+        this.bonuses = info.bonuses;
+        this.winMethod = info.winMethod;
     }
     Hand.prototype.isClosed = function () {
         return this.openMelds.length === 0;
@@ -32,19 +25,44 @@ var Hand = (function () {
     Hand.prototype.isSingleWait = function () {
         throw "unimplemented";
     };
+    Hand.prototype.hasBonus = function (bonus) {
+        return this.bonuses.indexOf(bonus) !== -1;
+    };
+    Hand.prototype.getTiles = function () {
+        var tiles = [];
+        for (var i = 0; i < this.melds.length; i++) {
+            for (var j = 0; j < this.melds[i].tiles.length; j++) {
+                tiles.push(this.melds[i].tiles[j]);
+            }
+        }
+        return tiles;
+    };
+    /**
+     * Returns points + 1 if closed, just points otherwise
+     */
+    Hand.prototype.plusOneIfClosed = function (points) {
+        if (this.isClosed()) {
+            return points + 1;
+        }
+        else {
+            return points;
+        }
+    };
     return Hand;
 }());
 exports.Hand = Hand;
-(function (WinningTileBonus) {
-    WinningTileBonus[WinningTileBonus["None"] = 0] = "None";
-    WinningTileBonus[WinningTileBonus["QuadrupleRob"] = 1] = "QuadrupleRob";
-    WinningTileBonus[WinningTileBonus["LastFromWall"] = 2] = "LastFromWall";
-    WinningTileBonus[WinningTileBonus["LastDiscard"] = 3] = "LastDiscard";
-    WinningTileBonus[WinningTileBonus["DeadWallDraw"] = 4] = "DeadWallDraw";
-})(exports.WinningTileBonus || (exports.WinningTileBonus = {}));
-var WinningTileBonus = exports.WinningTileBonus;
-(function (WinningDraw) {
-    WinningDraw[WinningDraw["Tsumo"] = 0] = "Tsumo";
-    WinningDraw[WinningDraw["Ron"] = 1] = "Ron"; // taking a discard
-})(exports.WinningDraw || (exports.WinningDraw = {}));
-var WinningDraw = exports.WinningDraw;
+(function (WinningBonus) {
+    WinningBonus[WinningBonus["QuadrupleRob"] = 0] = "QuadrupleRob";
+    WinningBonus[WinningBonus["LastFromWall"] = 1] = "LastFromWall";
+    WinningBonus[WinningBonus["LastDiscard"] = 2] = "LastDiscard";
+    WinningBonus[WinningBonus["DeadWallDraw"] = 3] = "DeadWallDraw";
+    WinningBonus[WinningBonus["Riichi"] = 4] = "Riichi";
+    WinningBonus[WinningBonus["DoubleRiichi"] = 5] = "DoubleRiichi";
+    WinningBonus[WinningBonus["Ippatsu"] = 6] = "Ippatsu";
+})(exports.WinningBonus || (exports.WinningBonus = {}));
+var WinningBonus = exports.WinningBonus;
+(function (WinningMethod) {
+    WinningMethod[WinningMethod["Tsumo"] = 0] = "Tsumo";
+    WinningMethod[WinningMethod["Ron"] = 1] = "Ron"; // taking a discard
+})(exports.WinningMethod || (exports.WinningMethod = {}));
+var WinningMethod = exports.WinningMethod;

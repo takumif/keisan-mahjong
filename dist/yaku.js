@@ -21,6 +21,57 @@ var Yaku = (function () {
     Yaku.englishName = "English name not set";
     return Yaku;
 }());
+exports.Yaku = Yaku;
+var AbstractDora = (function (_super) {
+    __extends(AbstractDora, _super);
+    function AbstractDora() {
+        _super.apply(this, arguments);
+    }
+    AbstractDora.calculateDoraPoints = function (doraTiles, tiles) {
+        var points = 0;
+        doraTiles.forEach(function (doraTile, i, _) {
+            var tileAfterDora = doraTile.nextWithWrapAround();
+            tiles.forEach(function (tile, j, _) {
+                if (tile.equals(tileAfterDora)) {
+                    points++;
+                }
+            });
+        });
+        return points;
+    };
+    return AbstractDora;
+}(Yaku));
+exports.AbstractDora = AbstractDora;
+var AbstractDoubleStraight = (function (_super) {
+    __extends(AbstractDoubleStraight, _super);
+    function AbstractDoubleStraight() {
+        _super.apply(this, arguments);
+    }
+    /**
+     * If there's one there's iipeikou, and if there are two it's ryanpeikou
+     */
+    AbstractDoubleStraight.countDoubleStraights = function (melds) {
+        var straights = {};
+        var count = 0;
+        melds.forEach(function (meld, i, _) {
+            if (meld instanceof meld_1.Straight) {
+                var key = meld.toString();
+                if (straights[key] === undefined) {
+                    straights[key] = 1;
+                }
+                else {
+                    straights[key]++;
+                }
+                if (straights[key] === 2 || straights[key] === 4) {
+                    count++;
+                }
+            }
+        });
+        return count;
+    };
+    return AbstractDoubleStraight;
+}(Yaku));
+exports.AbstractDoubleStraight = AbstractDoubleStraight;
 /**
  * Tanyaou Chuu (all simples) yaku pattern
  * A hand consisting only of suit tiles 2-8 (without terminal or honor tiles)
@@ -34,20 +85,18 @@ var AllSimples = (function (_super) {
         _super.apply(this, arguments);
     }
     AllSimples.calculate = function (hand) {
-        for (var i = 0; i < hand.melds.length; i++) {
-            for (var j = 0; j < hand.melds[i].tiles.length; j++) {
-                var tile = hand.melds[i].tiles[j];
-                if (tile.type === tile_1.TileType.Honor || tile.isTerminal())
-                    return 0;
+        hand.tiles.forEach(function (tile, i, _) {
+            if (tile.type === tile_1.TileType.Honor || tile.isTerminal()) {
+                return 0;
             }
-        }
+        });
         return 1;
     };
-    ;
     AllSimples.japaneseName = "Tanyao Chuu";
     AllSimples.englishName = "All Simples";
     return AllSimples;
 }(Yaku));
+exports.AllSimples = AllSimples;
 /**
  * Honitsu (half flush) yaku pattern
  * A hand with tiles from only one suit plus honor tiles
@@ -61,31 +110,23 @@ var HalfFlush = (function (_super) {
         _super.apply(this, arguments);
     }
     HalfFlush.calculate = function (hand) {
-        var nbHonorTile = 0;
+        var hasHonorTiles = false;
         var suit = null;
-        for (var i = 0; i < hand.melds.length; i++) {
-            for (var j = 0; j < hand.melds[i].tiles.length; j++) {
-                var tile = hand.melds[i].tiles[j];
-                if (tile.type === tile_1.TileType.Honor) {
-                    nbHonorTile++;
-                }
-                else {
-                    if (suit == null) {
-                        suit = tile.suit;
-                    }
-                    else if (suit != tile.suit) {
-                        return 0;
-                    }
-                }
-            }
-        }
-        if (nbHonorTile > 0) {
-            if (!hand.isClosed()) {
-                return 2;
+        hand.melds.forEach(function (meld, i, _) {
+            if (meld.suit === tile_1.Suit.Wind || meld.suit === tile_1.Suit.Dragon) {
+                hasHonorTiles = true;
             }
             else {
-                return 3;
+                if (suit === null) {
+                    suit = meld.suit;
+                }
+                else if (meld.suit !== suit) {
+                    return 0;
+                }
             }
+        });
+        if (hasHonorTiles) {
+            return hand.plusOneIfClosed(2);
         }
         else {
             return 0;
@@ -95,6 +136,7 @@ var HalfFlush = (function (_super) {
     HalfFlush.englishName = "Half Flush";
     return HalfFlush;
 }(Yaku));
+exports.HalfFlush = HalfFlush;
 /**
  * Chinitsu (full flush) yaku pattern
  * A hand with tiles from only one suit
@@ -102,38 +144,29 @@ var HalfFlush = (function (_super) {
  * Must be closed: no
  * Han: 6 (closed) / 5 (open)
  */
-var Chinitsu = (function (_super) {
-    __extends(Chinitsu, _super);
-    function Chinitsu() {
+var FullFlush = (function (_super) {
+    __extends(FullFlush, _super);
+    function FullFlush() {
         _super.apply(this, arguments);
     }
-    Chinitsu.calculate = function (hand) {
+    FullFlush.calculate = function (hand) {
         var suit = null;
-        for (var i = 0; i < hand.melds.length; i++) {
-            for (var j = 0; j < hand.melds[i].tiles.length; j++) {
-                var tile = hand.melds[i].tiles[j];
-                if (tile.type === tile_1.TileType.Honor)
-                    return 0;
-                if (suit === null) {
-                    suit = tile.suit;
-                }
-                else if (suit !== tile.suit) {
-                    return 0;
-                }
+        hand.melds.forEach(function (meld, i, _) {
+            var meld = hand.melds[i];
+            if (suit === null) {
+                suit = meld.suit;
             }
-        }
-        if (hand.isClosed()) {
-            return 6;
-        }
-        else {
-            return 5;
-        }
+            else if (meld.suit !== suit) {
+                return 0;
+            }
+        });
+        return hand.plusOneIfClosed(5);
     };
-    ;
-    Chinitsu.japaneseName = "Chinitsu";
-    Chinitsu.englishName = "Full Flush";
-    return Chinitsu;
+    FullFlush.japaneseName = "Chinitsu";
+    FullFlush.englishName = "Full Flush";
+    return FullFlush;
 }(Yaku));
+exports.FullFlush = FullFlush;
 /**
  * Honroutou (all terminals & honors) yaku pattern
  * A hand consisting of only terminals and honors
@@ -141,26 +174,24 @@ var Chinitsu = (function (_super) {
  * Must be closed: no
  * Han: 2
  */
-var Honroutou = (function (_super) {
-    __extends(Honroutou, _super);
-    function Honroutou() {
+var TerminalsAndHonors = (function (_super) {
+    __extends(TerminalsAndHonors, _super);
+    function TerminalsAndHonors() {
         _super.apply(this, arguments);
     }
-    Honroutou.calculate = function (hand) {
-        for (var i = 0; i < hand.melds.length; i++) {
-            for (var j = 0; j < hand.melds[i].tiles.length; j++) {
-                var tile = hand.melds[i].tiles[j];
-                if (!(tile.type === tile_1.TileType.Honor || tile.isTerminal()))
-                    return 0;
+    TerminalsAndHonors.calculate = function (hand) {
+        hand.tiles.forEach(function (tile, i, _) {
+            if (!(tile.type === tile_1.TileType.Honor || tile.isTerminal())) {
+                return 0;
             }
-        }
+        });
         return 2;
     };
-    ;
-    Honroutou.japaneseName = "Honroutou";
-    Honroutou.englishName = "All terminals & honors";
-    return Honroutou;
+    TerminalsAndHonors.japaneseName = "Honroutou";
+    TerminalsAndHonors.englishName = "All terminals & honors";
+    return TerminalsAndHonors;
 }(Yaku));
+exports.TerminalsAndHonors = TerminalsAndHonors;
 /**
  * Iipeikou (pure double chii) yaku pattern
  * Two chiis of the same value and suit
@@ -168,34 +199,27 @@ var Honroutou = (function (_super) {
  * Must be closed: yes
  * Han: 1
  */
-var Iipeikou = (function (_super) {
-    __extends(Iipeikou, _super);
-    function Iipeikou() {
+var DoubleStraight = (function (_super) {
+    __extends(DoubleStraight, _super);
+    function DoubleStraight() {
         _super.apply(this, arguments);
     }
-    Iipeikou.calculate = function (hand) {
-        if (!hand.isClosed())
+    DoubleStraight.calculate = function (hand) {
+        if (!hand.isClosed()) {
             return 0;
-        var storedChiis = [];
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Straight) {
-                for (var j = 0; j < storedChiis.length; j++) {
-                    if (storedChiis[j].tiles[0].suit == meld.tiles[0].suit &&
-                        storedChiis[j].tiles[0].value == meld.tiles[0].value) {
-                        return 1;
-                    }
-                }
-                storedChiis.push(meld);
-            }
         }
-        return 0;
+        if (DoubleStraight.countDoubleStraights(hand.melds) === 1) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
     };
-    ;
-    Iipeikou.japaneseName = "Iipeikou";
-    Iipeikou.englishName = "Pure Double Chii";
-    return Iipeikou;
-}(Yaku));
+    DoubleStraight.japaneseName = "Iipeikou";
+    DoubleStraight.englishName = "Pure Double Straight";
+    return DoubleStraight;
+}(AbstractDoubleStraight));
+exports.DoubleStraight = DoubleStraight;
 /**
  * San Shoku Doujun (mixed triple chii) yaku pattern
  * Three chiis of the same value, with one in each suit
@@ -209,38 +233,27 @@ var SanShokuDoujun = (function (_super) {
         _super.apply(this, arguments);
     }
     SanShokuDoujun.calculate = function (hand) {
-        /*
-        var storedChiis: {[id: number]: {[id: number]: number}} = {};
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof Straight) {
+        var straightsList = [];
+        hand.melds.forEach(function (meld, i, _) {
+            if (meld instanceof meld_1.Straight) {
                 var tile = meld.tiles[0];
-                
-                if (storedChiis[tile.value] == undefined) {
-                    storedChiis[tile.value] = { dot: 0, bamboo: 0, character: 0 };
+                if (straightsList[tile.value] === undefined) {
+                    straightsList[tile.value] = [];
                 }
-                
-                var chii = storedChiis[tile.value];
-                
-                chii[tile.suit]++;
-                
-                if (chii.dot && chii.bamboo && chii.character) {
-                    if (!hand.isClosed()) {
-                        return 1;
-                    } else {
-                        return 2;
-                    }
+                var straights = straightsList[tile.value];
+                straights[tile.suit] = true;
+                if (straights[tile_1.Suit.Character] && straights[tile_1.Suit.Circle] && straights[tile_1.Suit.Bamboo]) {
+                    return hand.plusOneIfClosed(1);
                 }
             }
-        }
-        */
+        });
         return 0;
     };
-    ;
     SanShokuDoujun.japaneseName = "San Shoku Doujun";
     SanShokuDoujun.englishName = "Mixed Triple Chii";
     return SanShokuDoujun;
 }(Yaku));
+exports.SanShokuDoujun = SanShokuDoujun;
 /**
  * Itsu or Ikkitsuukan (pure straight) yaku pattern
  * Three consecutive chiis (1-9) in the same suit
@@ -248,82 +261,83 @@ var SanShokuDoujun = (function (_super) {
  * Must be closed: no
  * Han: 2 (closed) / 1 (open)
  */
-var Itsu = (function (_super) {
-    __extends(Itsu, _super);
-    function Itsu() {
+var PureStraight = (function (_super) {
+    __extends(PureStraight, _super);
+    function PureStraight() {
         _super.apply(this, arguments);
     }
-    Itsu.calculate = function (hand) {
-        var storedChiis = {};
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
+    PureStraight.calculate = function (hand) {
+        var suits = [tile_1.Suit.Character, tile_1.Suit.Circle, tile_1.Suit.Bamboo];
+        var straights = {};
+        suits.forEach(function (suit, i, _) {
+            straights[suit] = [false, false, false];
+        });
+        hand.melds.forEach(function (meld, i, _) {
             if (meld instanceof meld_1.Straight) {
-                var tile = meld.tiles[0];
-                if (storedChiis[tile.suit] == undefined) {
-                    storedChiis[tile.suit] = { 1: 0, 4: 0, 7: 0 };
+                if (meld.tiles[0].value === 1) {
+                    straights[meld.suit][0] = true;
                 }
-                var chii = storedChiis[tile.suit];
-                chii[tile.value]++;
-                if (chii[1] && chii[4] && chii[7]) {
-                    if (!hand.isClosed()) {
-                        return 1;
-                    }
-                    else {
-                        return 2;
-                    }
+                else if (meld.tiles[0].value === 4) {
+                    straights[meld.suit][1] = true;
+                }
+                else if (meld.tiles[1].value === 7) {
+                    straights[meld.suit][2] = true;
                 }
             }
-        }
+        });
+        suits.forEach(function (suit, i, _) {
+            if (straights[suit][0] && straights[suit][1] && straights[suit][2]) {
+                return hand.plusOneIfClosed(1);
+            }
+        });
         return 0;
     };
-    ;
-    Itsu.japaneseName = "Itsu"; // can be call Ikkitsuukan
-    Itsu.englishName = "Pure Straight";
-    return Itsu;
+    PureStraight.japaneseName = "Ikkitsuukan";
+    PureStraight.englishName = "Pure Straight";
+    return PureStraight;
 }(Yaku));
+exports.PureStraight = PureStraight;
 /**
  * Chanta (outside hand) yaku pattern
- * A hand where all sets contain a terminal or honor tile, and at least one of the sets is a chii.
+ * A hand where at least one meld contains honor tiles, and the rest contain a terminal.
  *
  * Must be closed: no
  * Han: 2 (closed) / 1 (open)
  */
-var Chanta = (function (_super) {
-    __extends(Chanta, _super);
-    function Chanta() {
+var TerminalsOrHonorsInAllMelds = (function (_super) {
+    __extends(TerminalsOrHonorsInAllMelds, _super);
+    function TerminalsOrHonorsInAllMelds() {
         _super.apply(this, arguments);
     }
-    Chanta.calculate = function (hand) {
-        var nbChii = 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Straight)
-                nbChii++;
-            var nbTerminalOrHonor = 0;
-            for (var j = 0; j < meld.tiles.length; j++) {
-                var tile = meld.tiles[j];
-                if (tile.type === tile_1.TileType.Honor || tile.isTerminal())
-                    nbTerminalOrHonor++;
-            }
-            if (nbTerminalOrHonor == 0)
-                return 0;
-        }
-        if (nbChii > 0) {
-            if (hand.isClosed()) {
-                return 2;
+    TerminalsOrHonorsInAllMelds.calculate = function (hand) {
+        var hasHonorTiles = false;
+        var hasTerminals = false;
+        hand.melds.forEach(function (meld, i, _) {
+            if (meld.suit === tile_1.Suit.Wind || meld.suit === tile_1.Suit.Dragon) {
+                hasHonorTiles = true;
             }
             else {
-                return 1;
+                if (meld.tiles[0].isTerminal() ||
+                    (meld instanceof meld_1.Straight && meld.tiles[2].isTerminal())) {
+                    hasTerminals = true;
+                }
+                else {
+                    return 0;
+                }
             }
+        });
+        if (hasHonorTiles && hasTerminals) {
+            return hand.plusOneIfClosed(1);
         }
         else {
             return 0;
         }
     };
-    Chanta.japaneseName = "Chanta";
-    Chanta.englishName = "Outside Hand";
-    return Chanta;
+    TerminalsOrHonorsInAllMelds.japaneseName = "Chanta";
+    TerminalsOrHonorsInAllMelds.englishName = "Terminals or honors in all sets";
+    return TerminalsOrHonorsInAllMelds;
 }(Yaku));
+exports.TerminalsOrHonorsInAllMelds = TerminalsOrHonorsInAllMelds;
 /**
  * Chii Toitsu (seven pairs) yaku pattern
  * A hand consisting of seven pairs
@@ -331,29 +345,30 @@ var Chanta = (function (_super) {
  * Must be closed: yes
  * Han: 2
  */
-var ChiiToitsu = (function (_super) {
-    __extends(ChiiToitsu, _super);
-    function ChiiToitsu() {
+var SevenPairs = (function (_super) {
+    __extends(SevenPairs, _super);
+    function SevenPairs() {
         _super.apply(this, arguments);
     }
-    ChiiToitsu.calculate = function (hand) {
-        var nbPair = 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Pair)
-                nbPair++;
-        }
-        if (nbPair === 7) {
-            return 2;
-        }
-        else {
+    SevenPairs.calculate = function (hand) {
+        var pairs = [];
+        if (hand.closedMelds.length !== 7) {
             return 0;
         }
+        hand.closedMelds.forEach(function (meld, i, _) {
+            if (!(meld instanceof meld_1.Pair) ||
+                pairs.indexOf(meld.toString()) !== -1) {
+                return 0;
+            }
+            pairs.push(meld.toString());
+        });
+        return 2;
     };
-    ChiiToitsu.japaneseName = "Chii Toitsu";
-    ChiiToitsu.englishName = "Seven Pairs";
-    return ChiiToitsu;
+    SevenPairs.japaneseName = "Chii Toitsu";
+    SevenPairs.englishName = "Seven Pairs";
+    return SevenPairs;
 }(Yaku));
+exports.SevenPairs = SevenPairs;
 /**
  * San Shoku Dokou (triple pon) yaku pattern
  * One pon or kan in each of the three suits, all having the same number.
@@ -361,32 +376,31 @@ var ChiiToitsu = (function (_super) {
  * Must be closed: no
  * Han: 2
  */
-var SanShokuDokou = (function (_super) {
-    __extends(SanShokuDokou, _super);
-    function SanShokuDokou() {
+var ThreeColorTriples = (function (_super) {
+    __extends(ThreeColorTriples, _super);
+    function ThreeColorTriples() {
         _super.apply(this, arguments);
     }
-    SanShokuDokou.calculate = function (hand) {
-        var storedTriples = {};
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) {
-                var tile = meld.tiles[0];
-                if (tile.type === tile_1.TileType.Number) {
-                    if (storedTriples[tile.value] == undefined)
-                        storedTriples[tile.value] = 0;
-                    storedTriples[tile.value]++;
-                    if (storedTriples[tile.value] == 3)
-                        return 2;
-                }
+    ThreeColorTriples.calculate = function (hand) {
+        var tripleCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        hand.melds.forEach(function (meld, i, _) {
+            if ((meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) &&
+                meld.tiles[0].type === tile_1.TileType.Number) {
+                tripleCounts[meld.tiles[0].value]++;
             }
+        });
+        if (Math.max.apply(Math, tripleCounts) === 3) {
+            return 2;
         }
-        return 0;
+        else {
+            return 0;
+        }
     };
-    SanShokuDokou.japaneseName = "San Shoku Dokou";
-    SanShokuDokou.englishName = "Triple Triple";
-    return SanShokuDokou;
+    ThreeColorTriples.japaneseName = "San Shoku Dokou";
+    ThreeColorTriples.englishName = "Three Color Triples";
+    return ThreeColorTriples;
 }(Yaku));
+exports.ThreeColorTriples = ThreeColorTriples;
 /*
  * Toi-Toi Hou (all pons) yaku pattern
  * A hand with four pons/kans and one pair.
@@ -394,30 +408,30 @@ var SanShokuDokou = (function (_super) {
  * Must be closed: no
  * Han: 2
  */
-var ToiToiHou = (function (_super) {
-    __extends(ToiToiHou, _super);
-    function ToiToiHou() {
+var AllTriples = (function (_super) {
+    __extends(AllTriples, _super);
+    function AllTriples() {
         _super.apply(this, arguments);
     }
-    ToiToiHou.calculate = function (hand) {
-        var nbTriple = 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple)
-                nbTriple++;
-        }
-        if (nbTriple >= 4) {
+    AllTriples.calculate = function (hand) {
+        var count = 0;
+        hand.melds.forEach(function (meld, i, _) {
+            if (meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) {
+                count++;
+            }
+        });
+        if (count === 4) {
             return 2;
         }
         else {
             return 0;
         }
     };
-    ;
-    ToiToiHou.japaneseName = "Toi-Toi Hou";
-    ToiToiHou.englishName = "All Triple";
-    return ToiToiHou;
+    AllTriples.japaneseName = "Toi-Toi Hou";
+    AllTriples.englishName = "All Triples";
+    return AllTriples;
 }(Yaku));
+exports.AllTriples = AllTriples;
 /**
  * Shou Sangen (little three dragons) yaku pattern
  * Two pons/kans of dragons plus one pair of dragons.
@@ -425,117 +439,98 @@ var ToiToiHou = (function (_super) {
  * Must be closed: no
  * Han: 2
  */
-var ShouSangen = (function (_super) {
-    __extends(ShouSangen, _super);
-    function ShouSangen() {
+var LittleThreeDragons = (function (_super) {
+    __extends(LittleThreeDragons, _super);
+    function LittleThreeDragons() {
         _super.apply(this, arguments);
     }
-    ShouSangen.calculate = function (hand) {
-        var nbDragonPair = 0;
-        var nbDragonTriple = 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Pair) {
-                if (meld.tiles[0].suit === tile_1.Suit.Dragon)
-                    nbDragonPair++;
+    LittleThreeDragons.calculate = function (hand) {
+        var pairs = 0;
+        var triples = 0;
+        hand.melds.forEach(function (meld, i, _) {
+            if (meld.suit === tile_1.Suit.Dragon) {
+                if (meld instanceof meld_1.Pair) {
+                    pairs++;
+                }
+                else {
+                    triples++;
+                }
             }
-            else if (meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) {
-                if (meld.tiles[0].suit === tile_1.Suit.Dragon)
-                    nbDragonTriple++;
-            }
-        }
-        if (nbDragonPair >= 1 && nbDragonTriple >= 2) {
+        });
+        if (pairs === 1 && triples === 2) {
             return 2;
         }
         else {
             return 0;
         }
     };
-    ;
-    ShouSangen.japaneseName = "Shou Sangen";
-    ShouSangen.englishName = "Little Three Dragons";
-    return ShouSangen;
+    LittleThreeDragons.japaneseName = "Shou Sangen";
+    LittleThreeDragons.englishName = "Little Three Dragons";
+    return LittleThreeDragons;
 }(Yaku));
+exports.LittleThreeDragons = LittleThreeDragons;
 /**
- * Ryan Peikou (twice pure double chiis) yaku pattern
+ * Ryanpeikou (twice pure double chiis) yaku pattern
  * Two pair of chiis, where each pair consists of two identical chiis.
  *
- * Must be closed: no (some rules say yes)
+ * Must be closed: yes
  * Han: 3
  *
  */
-var RyanPeikou = (function (_super) {
-    __extends(RyanPeikou, _super);
-    function RyanPeikou() {
+var TwoDoubleStraights = (function (_super) {
+    __extends(TwoDoubleStraights, _super);
+    function TwoDoubleStraights() {
         _super.apply(this, arguments);
     }
-    RyanPeikou.calculate = function (hand) {
-        var chiis = {};
-        var nbPairOfChii = 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Straight) {
-                var chiiKey = meld.tiles[0].suit + meld.tiles[0].value;
-                if (chiis[chiiKey] == undefined)
-                    chiis[chiiKey] = 0;
-                else
-                    nbPairOfChii++;
-            }
+    TwoDoubleStraights.calculate = function (hand) {
+        if (!hand.isClosed()) {
+            return 0;
         }
-        if (nbPairOfChii == 2) {
-            if (hand.isClosed()) {
-                return 3;
-            }
-            else {
-                return 2;
-            }
-        }
-        return 0;
-    };
-    ;
-    RyanPeikou.japaneseName = "Ryan Peikou";
-    RyanPeikou.englishName = "Twice Pure Double Chii";
-    return RyanPeikou;
-}(Yaku));
-/**
- * Junchan Taiyai or Junchan Tayao or Junchan (terminals in all sets) yaku pattern
- * A hand with at least one chii and where all sets and the pair contains terminals
- *
- * Must be closed: no
- * Han: 3 (closed) / 2 (open)
- */
-var JunchanTaiyai = (function (_super) {
-    __extends(JunchanTaiyai, _super);
-    function JunchanTaiyai() {
-        _super.apply(this, arguments);
-    }
-    JunchanTaiyai.calculate = function (hand) {
-        var nbChii = 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Straight)
-                nbChii++;
-            var nbTerminal = 0;
-            for (var j = 0; j < meld.tiles.length; j++) {
-                var tile = meld.tiles[j];
-                if (tile.type === tile_1.TileType.Number && tile.isTerminal())
-                    nbTerminal++;
-            }
-            if (nbTerminal == 0)
-                return 0;
-        }
-        if (nbChii > 0) {
+        if (TwoDoubleStraights.countDoubleStraights(hand.melds) === 2) {
             return 3;
         }
         else {
             return 0;
         }
     };
-    ;
-    JunchanTaiyai.japaneseName = "Junchan Taiyai"; // can also be call Junchan Tayao or Junchan
-    JunchanTaiyai.englishName = "Terminals in all sets";
-    return JunchanTaiyai;
+    TwoDoubleStraights.japaneseName = "Ryanpeikou";
+    TwoDoubleStraights.englishName = "TwoDoubleStraights";
+    return TwoDoubleStraights;
+}(AbstractDoubleStraight));
+exports.TwoDoubleStraights = TwoDoubleStraights;
+/**
+ * Junchan Taiyaochuu or Junchan (terminals in all melds) yaku pattern
+ * A hand where all melds contain terminals
+ *
+ * Must be closed: no
+ * Han: 3 (closed) / 2 (open)
+ */
+var TerminalsInAllMelds = (function (_super) {
+    __extends(TerminalsInAllMelds, _super);
+    function TerminalsInAllMelds() {
+        _super.apply(this, arguments);
+    }
+    TerminalsInAllMelds.calculate = function (hand) {
+        hand.melds.forEach(function (meld, i, _) {
+            if (meld instanceof meld_1.Straight) {
+                if (!meld.tiles[0].isTerminal() &&
+                    !meld.tiles[2].isTerminal()) {
+                    return 0;
+                }
+            }
+            else {
+                if (!meld.tiles[0].isTerminal()) {
+                    return 0;
+                }
+            }
+        });
+        return hand.plusOneIfClosed(2);
+    };
+    TerminalsInAllMelds.japaneseName = "Junchan Taiyaochuu";
+    TerminalsInAllMelds.englishName = "Terminals in all melds";
+    return TerminalsInAllMelds;
 }(Yaku));
+exports.TerminalsInAllMelds = TerminalsInAllMelds;
 /**
  * Fanpai/Yakuhai (Seat Wind) yaku pattern
  * A pon or kan in the players wind.
@@ -549,21 +544,20 @@ var FanpaiSeatWind = (function (_super) {
         _super.apply(this, arguments);
     }
     FanpaiSeatWind.calculate = function (hand) {
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) {
-                var tile = meld.tiles[0];
-                if (tile.suit === tile_1.Suit.Wind && tile.value == hand.seatWind)
-                    return 1;
+        hand.melds.forEach(function (meld, i, _) {
+            if ((meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) &&
+                meld.suit === tile_1.Suit.Wind &&
+                meld.tiles[0].value === hand.seatWind) {
+                return 1;
             }
-        }
+        });
         return 0;
     };
-    ;
     FanpaiSeatWind.japaneseName = "Fanpai";
     FanpaiSeatWind.englishName = "Seat Wind";
     return FanpaiSeatWind;
 }(Yaku));
+exports.FanpaiSeatWind = FanpaiSeatWind;
 /**
  * Fanpai/Yakuhai (Round Wind) yaku pattern
  * A pon or kan in the prevalent wind.
@@ -577,27 +571,26 @@ var FanpaiRoundWind = (function (_super) {
         _super.apply(this, arguments);
     }
     FanpaiRoundWind.calculate = function (hand) {
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) {
-                var tile = meld.tiles[0];
-                if (tile.suit === tile_1.Suit.Wind && tile.value == hand.roundWind)
-                    return 1;
+        hand.melds.forEach(function (meld, i, _) {
+            if ((meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) &&
+                meld.suit === tile_1.Suit.Wind &&
+                meld.tiles[0].value === hand.roundWind) {
+                return 1;
             }
-        }
+        });
         return 0;
     };
-    ;
     FanpaiRoundWind.japaneseName = "Fanpai";
     FanpaiRoundWind.englishName = "Round Wind";
     return FanpaiRoundWind;
 }(Yaku));
+exports.FanpaiRoundWind = FanpaiRoundWind;
 /**
  * Fanpai/Yakuhai (Dragon Triple) yaku pattern
  * A pon or kan in the prevalent wind.
  *
  * Must be closed: no
- * Han: 1
+ * Han: 1 per meld
  */
 var FanpaiDragonTriple = (function (_super) {
     __extends(FanpaiDragonTriple, _super);
@@ -605,21 +598,20 @@ var FanpaiDragonTriple = (function (_super) {
         _super.apply(this, arguments);
     }
     FanpaiDragonTriple.calculate = function (hand) {
-        var nbDragonTriple = 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
-            if (meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) {
-                if (meld.tiles[0].suit === tile_1.Suit.Dragon)
-                    nbDragonTriple++;
+        var count = 0;
+        hand.melds.forEach(function (meld, i, _) {
+            if ((meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) &&
+                meld.suit === tile_1.Suit.Dragon) {
+                count++;
             }
-        }
-        return nbDragonTriple;
+        });
+        return count;
     };
-    ;
     FanpaiDragonTriple.japaneseName = "Fanpai";
     FanpaiDragonTriple.englishName = "Dragon Triple";
     return FanpaiDragonTriple;
 }(Yaku));
+exports.FanpaiDragonTriple = FanpaiDragonTriple;
 /**
  * Pinfu (All chii / No points) yaku pattern
  * A hand with no fu except the one for winning
@@ -634,20 +626,17 @@ var Pinfu = (function (_super) {
         _super.apply(this, arguments);
     }
     Pinfu.calculate = function (hand) {
-        if (!hand.isClosed())
+        if (!hand.isClosed() ||
+            hand.isEdgeWait() ||
+            hand.isClosedWait() ||
+            hand.isSingleWait()) {
             return 0;
-        if (hand.isEdgeWait())
-            return 0;
-        if (hand.isClosedWait())
-            return 0;
-        if (hand.isSingleWait())
-            return 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
+        }
+        hand.melds.forEach(function (meld, i, _) {
             if (meld instanceof meld_1.Pair) {
-                if (meld.tiles[0].suit === tile_1.Suit.Dragon)
+                if (meld.suit === tile_1.Suit.Dragon)
                     return 0;
-                if (meld.tiles[0].suit === tile_1.Suit.Wind) {
+                if (meld.suit === tile_1.Suit.Wind) {
                     if (meld.tiles[0].value === hand.seatWind)
                         return 0;
                     if (meld.tiles[0].value === hand.roundWind)
@@ -656,14 +645,14 @@ var Pinfu = (function (_super) {
             }
             if (meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple)
                 return 0;
-        }
+        });
         return 1;
     };
-    ;
     Pinfu.japaneseName = "Pinfu";
     Pinfu.englishName = "All Chii / No points";
     return Pinfu;
 }(Yaku));
+exports.Pinfu = Pinfu;
 /**
  * San Ankou (3 closed pons) yaku pattern
  * A hand with three closed pons or kans.
@@ -671,58 +660,57 @@ var Pinfu = (function (_super) {
  * Must be closed: no
  * Han: 2
  */
-var SanAnkou = (function (_super) {
-    __extends(SanAnkou, _super);
-    function SanAnkou() {
+var ThreeClosedTriples = (function (_super) {
+    __extends(ThreeClosedTriples, _super);
+    function ThreeClosedTriples() {
         _super.apply(this, arguments);
     }
-    SanAnkou.calculate = function (hand) {
-        var nbclosedTriple = 0;
-        for (var i = 0; i < hand.closedMelds.length; i++) {
-            var meld = hand.closedMelds[i];
+    ThreeClosedTriples.calculate = function (hand) {
+        var count = 0;
+        hand.closedMelds.forEach(function (meld, i, _) {
             if (meld instanceof meld_1.Triple || meld instanceof meld_1.Quadruple) {
-                nbclosedTriple++;
+                count++;
             }
-        }
-        if (nbclosedTriple >= 3) {
+        });
+        if (count >= 3) {
             return 2;
         }
         return 0;
     };
-    ;
-    SanAnkou.japaneseName = "San Ankou";
-    SanAnkou.englishName = "3 closed pons";
-    return SanAnkou;
+    ThreeClosedTriples.japaneseName = "San Ankou";
+    ThreeClosedTriples.englishName = "Three Closed Triples";
+    return ThreeClosedTriples;
 }(Yaku));
+exports.ThreeClosedTriples = ThreeClosedTriples;
 /**
- * San Quadruple Tsu (3 kans) yaku pattern
+ * San Kan Tsu (3 kans) yaku pattern
  * A hand with three kans.
  *
  * Must be closed: no
  * Han: 2
  */
-var SanQuadrupleTsu = (function (_super) {
-    __extends(SanQuadrupleTsu, _super);
-    function SanQuadrupleTsu() {
+var ThreeQuadruples = (function (_super) {
+    __extends(ThreeQuadruples, _super);
+    function ThreeQuadruples() {
         _super.apply(this, arguments);
     }
-    SanQuadrupleTsu.calculate = function (hand) {
-        var nbQuadruple = 0;
-        for (var i = 0; i < hand.melds.length; i++) {
-            if (hand.melds[i] instanceof meld_1.Quadruple) {
-                nbQuadruple++;
+    ThreeQuadruples.calculate = function (hand) {
+        var quadruples = 0;
+        hand.melds.forEach(function (meld, i, _) {
+            if (meld instanceof meld_1.Quadruple) {
+                quadruples++;
             }
-        }
-        if (nbQuadruple >= 3) {
+        });
+        if (quadruples >= 3) {
             return 2;
         }
         return 0;
     };
-    ;
-    SanQuadrupleTsu.japaneseName = "San Quadruple Tsu";
-    SanQuadrupleTsu.englishName = "3 kans";
-    return SanQuadrupleTsu;
+    ThreeQuadruples.japaneseName = "San Kan Tsu";
+    ThreeQuadruples.englishName = "3 kans";
+    return ThreeQuadruples;
 }(Yaku));
+exports.ThreeQuadruples = ThreeQuadruples;
 /**
  * Menzen Tsumo (Fully closed Hand) yaku pattern
  * Going out on self-draw with a closed hand.
@@ -736,16 +724,16 @@ var MenzenTsumo = (function (_super) {
         _super.apply(this, arguments);
     }
     MenzenTsumo.calculate = function (hand) {
-        if (hand.winningDraw === hand_1.WinningDraw.Tsumo && hand.isClosed()) {
+        if (hand.winMethod === hand_1.WinningMethod.Tsumo && hand.isClosed()) {
             return 1;
         }
         return 0;
     };
-    ;
     MenzenTsumo.japaneseName = "Menzen Tsumo";
     MenzenTsumo.englishName = "Fully closed Hand";
     return MenzenTsumo;
 }(Yaku));
+exports.MenzenTsumo = MenzenTsumo;
 /**
  * Riichi yaku pattern
  * Waiting hand with declaration and 1000 point buy in.
@@ -759,16 +747,17 @@ var Riichi = (function (_super) {
         _super.apply(this, arguments);
     }
     Riichi.calculate = function (hand) {
-        if (hand.riichi) {
+        if (hand.hasBonus(hand_1.WinningBonus.Riichi) ||
+            hand.hasBonus(hand_1.WinningBonus.DoubleRiichi)) {
             return 1;
         }
         return 0;
     };
-    ;
     Riichi.japaneseName = "Riichi";
     Riichi.englishName = "Riichi";
     return Riichi;
 }(Yaku));
+exports.Riichi = Riichi;
 /**
  * Double Riichi yaku pattern
  * Declaring riichi within the first uninterrupted go around.
@@ -782,16 +771,16 @@ var DoubleRiichi = (function (_super) {
         _super.apply(this, arguments);
     }
     DoubleRiichi.calculate = function (hand) {
-        if (hand.doubleRiichi) {
+        if (hand.hasBonus(hand_1.WinningBonus.DoubleRiichi)) {
             return 1;
         }
         return 0;
     };
-    ;
     DoubleRiichi.japaneseName = "Double Riichi";
     DoubleRiichi.englishName = "Double Riichi";
     return DoubleRiichi;
 }(Yaku));
+exports.DoubleRiichi = DoubleRiichi;
 /**
  * Ippatsu (One Shot) yaku pattern
  * Winning within the first uninterrupted go around after declaring riichi .
@@ -805,16 +794,16 @@ var Ippatsu = (function (_super) {
         _super.apply(this, arguments);
     }
     Ippatsu.calculate = function (hand) {
-        if (hand.ippatsu) {
+        if (hand.hasBonus(hand_1.WinningBonus.Ippatsu)) {
             return 1;
         }
         return 0;
     };
-    ;
     Ippatsu.japaneseName = "Ippatsu";
     Ippatsu.englishName = "One Shot";
     return Ippatsu;
 }(Yaku));
+exports.Ippatsu = Ippatsu;
 /**
  * Haitei Raoyue (Last Tile Draw) yaku pattern
  * Winning on the very last tile
@@ -822,22 +811,22 @@ var Ippatsu = (function (_super) {
  * Must be closed: no
  * Han: 1
  */
-var HaiteiRaoyue = (function (_super) {
-    __extends(HaiteiRaoyue, _super);
-    function HaiteiRaoyue() {
+var LastFromWall = (function (_super) {
+    __extends(LastFromWall, _super);
+    function LastFromWall() {
         _super.apply(this, arguments);
     }
-    HaiteiRaoyue.calculate = function (hand) {
-        if (hand.winningDraw === hand_1.WinningDraw.Tsumo && hand.winBonus === hand_1.WinningTileBonus.LastFromWall) {
+    LastFromWall.calculate = function (hand) {
+        if (hand.winMethod === hand_1.WinningMethod.Tsumo && hand.hasBonus(hand_1.WinningBonus.LastFromWall)) {
             return 1;
         }
         return 0;
     };
-    ;
-    HaiteiRaoyue.japaneseName = "Haitei Raoyue";
-    HaiteiRaoyue.englishName = "Last Tile Draw";
-    return HaiteiRaoyue;
+    LastFromWall.japaneseName = "Haitei Raoyue";
+    LastFromWall.englishName = "Last From Wall";
+    return LastFromWall;
 }(Yaku));
+exports.LastFromWall = LastFromWall;
 /**
  * Houtei Raoyui (Last Tile Discard) yaku pattern
  * Winning on the very last discard
@@ -845,22 +834,22 @@ var HaiteiRaoyue = (function (_super) {
  * Must be closed: no
  * Han: 1
  */
-var HouteiRaoyui = (function (_super) {
-    __extends(HouteiRaoyui, _super);
-    function HouteiRaoyui() {
+var LastDiscard = (function (_super) {
+    __extends(LastDiscard, _super);
+    function LastDiscard() {
         _super.apply(this, arguments);
     }
-    HouteiRaoyui.calculate = function (hand) {
-        if (hand.winningDraw === hand_1.WinningDraw.Ron && hand.winBonus === hand_1.WinningTileBonus.LastDiscard) {
+    LastDiscard.calculate = function (hand) {
+        if (hand.winMethod === hand_1.WinningMethod.Ron && hand.hasBonus(hand_1.WinningBonus.LastDiscard)) {
             return 1;
         }
         return 0;
     };
-    ;
-    HouteiRaoyui.japaneseName = "Houtei Raoyui";
-    HouteiRaoyui.englishName = "Last Tile Discard";
-    return HouteiRaoyui;
+    LastDiscard.japaneseName = "Houtei Raoyui";
+    LastDiscard.englishName = "Last Discard";
+    return LastDiscard;
 }(Yaku));
+exports.LastDiscard = LastDiscard;
 /**
  * Rinshan Kaihou (After Quadruple) yaku pattern
  * Winning after drawing a replacement tile.
@@ -868,22 +857,22 @@ var HouteiRaoyui = (function (_super) {
  * Must be closed: no
  * Han: 1
  */
-var RinshanKaihou = (function (_super) {
-    __extends(RinshanKaihou, _super);
-    function RinshanKaihou() {
+var DeadWallDraw = (function (_super) {
+    __extends(DeadWallDraw, _super);
+    function DeadWallDraw() {
         _super.apply(this, arguments);
     }
-    RinshanKaihou.calculate = function (hand) {
-        if (hand.winningDraw === hand_1.WinningDraw.Tsumo && hand.winBonus === hand_1.WinningTileBonus.DeadWallDraw) {
+    DeadWallDraw.calculate = function (hand) {
+        if (hand.winMethod === hand_1.WinningMethod.Tsumo && hand.hasBonus(hand_1.WinningBonus.DeadWallDraw)) {
             return 1;
         }
         return 0;
     };
-    ;
-    RinshanKaihou.japaneseName = "Rinshan Kaihou";
-    RinshanKaihou.englishName = "After kan";
-    return RinshanKaihou;
+    DeadWallDraw.japaneseName = "Rinshan Kaihou";
+    DeadWallDraw.englishName = "Dead Wall Draw";
+    return DeadWallDraw;
 }(Yaku));
+exports.DeadWallDraw = DeadWallDraw;
 /**
  * Chan kan (Robbing the kan) yaku pattern
  * Winning on off a tile used to extend a kong.
@@ -891,22 +880,22 @@ var RinshanKaihou = (function (_super) {
  * Must be closed: no
  * Han: 1
  */
-var ChanQuadruple = (function (_super) {
-    __extends(ChanQuadruple, _super);
-    function ChanQuadruple() {
+var QuadrupleRob = (function (_super) {
+    __extends(QuadrupleRob, _super);
+    function QuadrupleRob() {
         _super.apply(this, arguments);
     }
-    ChanQuadruple.calculate = function (hand) {
-        if (hand.winningDraw === hand_1.WinningDraw.Ron && hand.winBonus === hand_1.WinningTileBonus.QuadrupleRob) {
+    QuadrupleRob.calculate = function (hand) {
+        if (hand.winMethod === hand_1.WinningMethod.Ron && hand.hasBonus(hand_1.WinningBonus.QuadrupleRob)) {
             return 1;
         }
         return 0;
     };
-    ;
-    ChanQuadruple.japaneseName = "Chan Quadruple";
-    ChanQuadruple.englishName = "Robbing the kan";
-    return ChanQuadruple;
+    QuadrupleRob.japaneseName = "Chan Kan";
+    QuadrupleRob.englishName = "Robbing the Quadruple";
+    return QuadrupleRob;
 }(Yaku));
+exports.QuadrupleRob = QuadrupleRob;
 /**
  * Dora yaku pattern
  *
@@ -919,26 +908,13 @@ var Dora = (function (_super) {
         _super.apply(this, arguments);
     }
     Dora.calculate = function (hand) {
-        var points = 0;
-        for (var i = 0; i < hand.dora.length; i++) {
-            var doraTile = hand.dora[i];
-            var tileAfterDora = doraTile.nextWithWrapAround();
-            for (var j = 0; j < hand.melds.length; j++) {
-                for (var k = 0; k < hand.melds[j].tiles.length; k++) {
-                    var tile = hand.melds[j].tiles[k];
-                    if (tile.equals(tileAfterDora)) {
-                        points++;
-                    }
-                }
-            }
-        }
-        return points;
+        return Dora.calculateDoraPoints(hand.dora, hand.tiles);
     };
-    ;
     Dora.japaneseName = "Dora";
     Dora.englishName = "Dora";
     return Dora;
-}(Yaku));
+}(AbstractDora));
+exports.Dora = Dora;
 /**
  * Ura-Dora yaku pattern
  *
@@ -951,25 +927,14 @@ var UraDora = (function (_super) {
         _super.apply(this, arguments);
     }
     UraDora.calculate = function (hand) {
-        if (!hand.riichi)
+        if (!hand.hasBonus(hand_1.WinningBonus.Riichi) &&
+            !hand.hasBonus(hand_1.WinningBonus.DoubleRiichi)) {
             return 0;
-        var points = 0;
-        for (var i = 0; i < hand.uraDora.length; i++) {
-            var doraTile = hand.uraDora[i];
-            var tileAfterDora = doraTile.nextWithWrapAround();
-            for (var j = 0; j < hand.melds.length; j++) {
-                for (var k = 0; k < hand.melds[j].tiles.length; k++) {
-                    var tile = hand.melds[j].tiles[k];
-                    if (tile.equals(tileAfterDora)) {
-                        points++;
-                    }
-                }
-            }
         }
-        return points;
+        return UraDora.calculateDoraPoints(hand.uraDora, hand.tiles);
     };
-    ;
     UraDora.japaneseName = "Ura-Dora";
     UraDora.englishName = "Ura-Dora";
     return UraDora;
-}(Yaku));
+}(AbstractDora));
+exports.UraDora = UraDora;

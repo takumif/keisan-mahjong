@@ -164,81 +164,9 @@ var Tile = (function () {
             if (!tiles[i].equals(tiles[i + 1])) {
                 return null;
             }
-            pairs.push(new meld_1.Pair(tiles[i], tiles[i + 1]));
+            pairs.push(new meld_1.Pair(tiles[i]));
         }
         return pairs;
-    };
-    /**
-     * Returns a list of possible ways to form melds with the given tiles.
-     * We assume that the tiles are closed, and hence there are no quadruples,
-     * and there should be one to five melds (one of which a pair), or seven pairs.
-     * An empty list is returned if all combinations end up with leftover tiles.
-     */
-    Tile.formMelds = function (tiles) {
-        if (tiles.length % 3 !== 2 || tiles.length > 14) {
-            throw "Invalid number of tiles!";
-        }
-        var tiles = Tile.copyArray(tiles);
-        tiles.sort(Tile.compare);
-        var meldLists = Tile.formMeldsWithSortedTiles(tiles);
-        return meldLists.filter(function (melds, i, a) {
-            return meld_1.Meld.hasOneOrSevenPairs(melds);
-        });
-    };
-    /**
-     * Requires that the tiles are sorted.
-     */
-    Tile.formMeldsWithSortedTiles = function (tiles) {
-        if (tiles.length === 0) {
-            return [[]];
-        }
-        var meldLists = [];
-        meldLists = meldLists
-            .concat(Tile.formMeldsWithFirstTileInPair(tiles))
-            .concat(Tile.formMeldsWithFirstTileInTriple(tiles))
-            .concat(Tile.formMeldsWithFirstTileInStraight(tiles));
-        return meldLists;
-    };
-    /**
-     * Requires that the tiles are sorted
-     */
-    Tile.formMeldsWithFirstTileInPair = function (tiles) {
-        if (tiles.length < 2 || !tiles[0].equals(tiles[1])) {
-            return [];
-        }
-        var pair = new meld_1.Pair(tiles[0], tiles[1]);
-        return Tile.formMeldsWithSortedTiles(tiles.slice(2)).map(function (melds, i, a) {
-            return [pair].concat(melds);
-        });
-    };
-    /**
-     * Requires that the tiles are sorted
-     */
-    Tile.formMeldsWithFirstTileInTriple = function (tiles) {
-        if (tiles.length < 3 || !tiles[0].equals(tiles[1]) || !tiles[0].equals(tiles[2])) {
-            return [];
-        }
-        var triple = new meld_1.Triple(tiles[0], tiles[1], tiles[2]);
-        return Tile.formMeldsWithSortedTiles(tiles.slice(3)).map(function (melds, i, a) {
-            return [triple].concat(melds);
-        });
-    };
-    /**
-     * Requires that the tiles are sorted
-     */
-    Tile.formMeldsWithFirstTileInStraight = function (tiles) {
-        if (tiles.length < 3) {
-            return [];
-        }
-        var straight = Tile.extractStraight(tiles, tiles[0]);
-        if (straight === null) {
-            return [];
-        }
-        else {
-            return Tile.formMeldsWithSortedTiles(straight.otherTiles).map(function (melds, i, a) {
-                return [straight.straight].concat(melds);
-            });
-        }
     };
     /**
      * Returns null if not possible

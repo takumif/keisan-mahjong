@@ -1,4 +1,4 @@
-import { Meld, Pair } from "./meld";
+import { Pair, Straight } from "./meld";
 export declare class Tile {
     suit: Suit;
     type: TileType;
@@ -42,32 +42,12 @@ export declare class Tile {
      */
     static formSevenPairs(tiles: Tile[]): Pair[];
     /**
-     * Returns a list of possible ways to form melds with the given tiles.
-     * We assume that the tiles are closed, and hence there are no quadruples,
-     * and there should be one to five melds (one of which a pair), or seven pairs.
-     * An empty list is returned if all combinations end up with leftover tiles.
-     */
-    static formMelds(tiles: Tile[]): Meld[][];
-    /**
-     * Requires that the tiles are sorted.
-     */
-    private static formMeldsWithSortedTiles(tiles);
-    /**
-     * Requires that the tiles are sorted
-     */
-    private static formMeldsWithFirstTileInPair(tiles);
-    /**
-     * Requires that the tiles are sorted
-     */
-    private static formMeldsWithFirstTileInTriple(tiles);
-    /**
-     * Requires that the tiles are sorted
-     */
-    private static formMeldsWithFirstTileInStraight(tiles);
-    /**
      * Returns null if not possible
      */
-    private static extractStraight(tiles, firstTile);
+    static extractStraight(tiles: Tile[], firstTile: Tile): {
+        straight: Straight;
+        otherTiles: Tile[];
+    };
 }
 export declare enum Suit {
     Character = 0,

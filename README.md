@@ -1,8 +1,8 @@
 # Keisan
 
-    Just according to keisan (Translator's note: keisan means calculations)
+    "Just according to keisan (Translator's note: keisan means calculations)"
 
-A JavaScript/TypeScript library for calculating scores for Riichi (Japanese) Mahjong.
+A JavaScript/TypeScript library for calculating Riichi (Japanese) Mahjong scores.
 
 ## Usage
 ```javascript

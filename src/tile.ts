@@ -71,6 +71,16 @@ export class Tile {
         }
     }
     
+    /**
+     * True iff the tile is 1 or 9
+     */
+    isTerminal(): boolean {
+        return (
+            (this.type === TileType.Number) &&
+            (this.value === 1 || this.value === 9)
+        );
+    }
+    
     equals(other: Tile): boolean {
         return this.suit === other.suit && this.value === other.value;
     }
@@ -166,10 +176,10 @@ export class Tile {
      * Returns a list of possible ways to form melds with the given tiles.
      * We assume that the tiles are closed, and hence there are no quadruples,
      * and there should be one to five melds (one of which a pair), or seven pairs.
-     * An empty list is returned if no melds can be formed.
+     * An empty list is returned if all combinations end up with leftover tiles.
      */
     static formMelds(tiles: Tile[]): Meld[][] {
-        if (tiles.length % 3 !== 2) {
+        if (tiles.length % 3 !== 2 || tiles.length > 14) {
             throw "Invalid number of tiles!";
         }
         var tiles = Tile.copyArray(tiles);
@@ -209,7 +219,7 @@ export class Tile {
         }
         var pair = new Pair(tiles[0], tiles[1]);
         return Tile.formMeldsWithSortedTiles(tiles.slice(2)).map((melds, i, a) => {
-            return melds.concat([pair]);
+            return [pair].concat(melds);
         });
     }
 
@@ -222,7 +232,7 @@ export class Tile {
         }
         var triple = new Triple(tiles[0], tiles[1], tiles[2]);
         return Tile.formMeldsWithSortedTiles(tiles.slice(3)).map((melds, i, a) => {
-            return melds.concat([triple]);
+            return [triple].concat(melds);
         });
     }
 
@@ -238,7 +248,7 @@ export class Tile {
             return [];
         } else {
             return Tile.formMeldsWithSortedTiles(straight.otherTiles).map((melds, i, a) => {
-                return melds.concat([straight.straight]);
+                return [straight.straight].concat(melds);
             });
         }
     }

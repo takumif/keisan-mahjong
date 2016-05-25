@@ -4,6 +4,11 @@ var T = require("../dist/tile");
 var Tile = T.Tile, Suit = T.Suit, TileType = T.TileType, Wind = T.Wind, Dragon = T.Dragon;
 var M = require("../dist/meld");
 var Meld = M.Meld, Pair = M.Pair, Triple = M.Triple, Straight = M.Straight, Quadruple = M.Quadruple;
+var P = require("../dist/parser");
+var Parser = P.Parser;
+var H = require("../dist/hand");
+var Hand = H.Hand;
+var U = require("./util");
 
 var w1 = new Tile(Suit.Character, 1);
 var w1_2 = new Tile(Suit.Character, 1);
@@ -27,8 +32,8 @@ var north = new Tile(Suit.Wind, Wind.North);
 var bai = new Tile(Suit.Dragon, Dragon.White);
 var bai2 = new Tile(Suit.Dragon, Dragon.White);
 
-var sevenPairTiles = [w1, w1_2, w2, w2_2, w9, w9_2, p6, p6_2, s3, s3_2, east, east2, bai, bai2];
-var ibeikou = [w1, w1_2, w2, w2_2, w3, w3_2, w9, w9_2, w9_3, s3, s3_2, s3_3, east, east2];
+var sevenPairTiles = [U.w1, U.w1, U.w2, U.w2, U.w9, U.w9, U.p6, U.p6, U.s3, U.s3, U.e, U.e, U.white, U.white];
+var ibeikou = [U.w1, U.w1, U.w2, U.w2, U.w3, U.w3, U.w9, U.w9, U.w9, U.s3, U.s3, U.s3, U.e, U.e];
 
 describe("A tile object", () => {
     it("can get its next number right, if possible (nextNumber)", () => {
@@ -88,26 +93,6 @@ describe("The Tile class", () => {
         expect(Tile.formSevenPairs(
             sevenPairTiles
         ).length).toEqual(7);
-    });
-    
-    it("can form seven pairs when asked to form melds (formMelds)", () => {
-        expect(Tile.formMelds(sevenPairTiles).length).toEqual(1);
-        expect(Tile.formMelds(sevenPairTiles)[0].length).toEqual(7);
-    });
-    
-    it("can get ibeikou right, and give back melds in the right order (formMelds)", () => {
-        var melds = Tile.formMelds(ibeikou);
-        expect(melds.length).toBeGreaterThan(0);
-        expect(melds[0]).toContain(new Straight(w1, w2, w3));
-        expect(melds[0]).toContain(new Triple(s3, s3_2, s3_3));
-        expect(melds[0].length).toEqual(5);
-        expect(melds[0]).toEqual([
-            new Straight(w1, w2, w3),
-            new Straight(w1, w2, w3),
-            new Triple(w9, w9, w9),
-            new Triple(s3, s3, s3),
-            new Pair(east, east)
-        ]);
     });
     
     it("can recognize a straight (extractStraight)", () => {

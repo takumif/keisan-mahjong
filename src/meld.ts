@@ -17,6 +17,17 @@ export abstract class Meld {
         return true;
     }
     
+    toString(): string {
+        var str = "[";
+        this.tiles.forEach((tile, i, _) => {
+            str += tile.toString();
+            if (i < this.tiles.length - 1) {
+                str += ", ";
+            }
+        });
+        return str + "]";
+    }
+    
     static hasOneOrSevenPairs(melds: Meld[]): boolean {
         var pairs = 0;
         melds.forEach((meld, i, a) => {

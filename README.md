@@ -10,7 +10,7 @@ to be written
 ```
 
 ## Development
-Stuff we use:
+Stuff we use (only used for development purposes, so not really dependencies):
 * TypeScript
 * npm
 * Gulp
@@ -22,6 +22,14 @@ Then you can run `gulp build` for transcompiling JavaScript, and `gulp test` for
 
 You can run `typings install` to get the necessary TypeScript definitions.
 You might need to do `npm install -g typings` before that.
+
+## To-Do
+* Write tests for Hand, Meld and Yaku
+* Make Yaku cleaner
+* Debug Yaku
+* Implement Hand methods
+* Implement Parser methods
+* Implement Tile methods
 
 ---
 

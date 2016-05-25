@@ -8,11 +8,15 @@ export class Parser {
     }
     
     static parseTiles(text: string): Tile[] {
-        throw "";
+        text = text.replace(/\s|\[|\]|\(|\)/g, "");
+        var splitText = text.split(",");
+        return splitText.map((tileText, i, a) => {
+            return Parser.parseTile(tileText);
+        });
     }
     
     static parseTile(text: string): Tile {
-        text = text.replace(/\s/g, "").toLowerCase();
+        text = text.replace(/\s/g, "");
         var num = Number(text.charAt(text.length - 1));
         if (isNaN(num)) {
             return Parser.parseHonorTile(text);
@@ -53,11 +57,21 @@ export class Parser {
     }
     
     private static parseNumberTile(text: string, value: number): Tile {
+        text = text.replace(/\s/g, "").toLowerCase();
         switch (text) {
             case "character":
             case "w":
             case "wan":
                 return new Tile(Suit.Character, value);
+            case "circle":
+            case "t":
+            case "p":
+            case "ton":
+                return new Tile(Suit.Circle, value);
+            case "bamboo":
+            case "s":
+            case "sou":
+                return new Tile(Suit.Bamboo, value);
         }
         throw "Unable to parse the text for a tile: " + text;
     }

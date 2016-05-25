@@ -3,6 +3,7 @@ import {Meld, Pair, Triple, Straight, Quadruple} from "./meld"
 
 export class Hand {
     public melds: Meld[];
+    public tiles: Tile[];
     public seatWind: Wind;
     public roundWind: Wind;
     public winningTile: Tile;
@@ -25,6 +26,7 @@ export class Hand {
         }
     ) {
         this.melds = this.closedMelds.concat(this.openMelds);
+        this.tiles = this.getTiles();
         this.seatWind = info.seatWind;
         this.roundWind = info.roundWind;
         this.winningTile = info.winningTile;
@@ -53,6 +55,27 @@ export class Hand {
     hasBonus(bonus: WinningBonus): boolean {
         return this.bonuses.indexOf(bonus) !== -1;
     }
+    
+    private getTiles(): Tile[] {
+        var tiles: Tile[] = [];
+        for (var i = 0; i < this.melds.length; i ++) {
+            for (var j = 0; j < this.melds[i].tiles.length; j++) {
+                tiles.push(this.melds[i].tiles[j]);
+            }
+        }
+        return tiles;
+    }
+    
+    /**
+     * Returns points + 1 if closed, just points otherwise
+     */
+    plusOneIfClosed(points: number): number {
+        if (this.isClosed()) {
+            return points + 1;
+        } else {
+            return points;
+        }
+    }
 }
 
 export enum WinningBonus {
@@ -66,6 +89,6 @@ export enum WinningBonus {
 }
 
 export enum WinningMethod {
-    Tsumo, // self-draw
-    Ron // taking a discard
+    Tsumo,  // self-draw
+    Ron     // taking a discard
 }

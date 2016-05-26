@@ -18,11 +18,11 @@ export abstract class Yaku {
     static getApplyingYakuList(hand: Hand): typeof Yaku[] {
         var applyingYakus: typeof Yaku[] = [];
         Yaku.initYakuList();
-        Yaku.list.forEach((Y, i, _) => {
+        for (const Y of Yaku.list) {
             if (Y.calculate(hand) > 0) {
                 applyingYakus.push(Y);
             }
-        });
+        }
         return applyingYakus;
     }
     
@@ -32,9 +32,9 @@ export abstract class Yaku {
             Yaku.initYakuList();
             yakus = Yaku.list;
         }
-        yakus.forEach((Y, i, _) => {
+        for (const Y of yakus) {
             han += Y.calculate(hand);
-        });
+        }
         return han;
     }
     
@@ -83,14 +83,14 @@ export abstract class Yaku {
 export abstract class AbstractDora extends Yaku {
     static calculateDoraPoints(doraTiles: Tile[], tiles: Tile[]): number {
         var points = 0;
-        doraTiles.forEach((doraTile, i, _) => {
+        for (const doraTile of doraTiles) {
             var tileAfterDora = doraTile.nextWithWrapAround();
-            tiles.forEach((tile, j, _) => {
+            for (const tile of tiles) {
                 if (tile.equals(tileAfterDora)) {
                     points++;
                 }
-            });
-        });
+            }
+        }
         
         return points;
     }
@@ -103,7 +103,7 @@ export abstract class AbstractDoubleStraight extends Yaku {
     protected static countDoubleStraights(melds: Meld[]): number {
         var straights: {[id: string]: number} = {};
         var count = 0;
-        melds.forEach((meld, i, _) => {
+        for (const meld of melds) {
             if (meld instanceof Straight) {
                 var key = meld.toString();
                 if (straights[key] === undefined) {
@@ -116,7 +116,7 @@ export abstract class AbstractDoubleStraight extends Yaku {
                     count++;
                 }
             }
-        });
+        }
         return count;
     }
 }
@@ -133,11 +133,11 @@ export class AllSimples extends Yaku {
     static englishName = "All Simples";
     
     static calculate(hand: Hand): number {
-        hand.tiles.forEach((tile, i, _) => {
+        for (const tile of hand.tiles) {
             if (tile.type === TileType.Honor || tile.isTerminal()) {
                 return 0;
             }
-        })
+        }
         return 1;
     }
 }
@@ -155,11 +155,11 @@ export class AllTriples extends Yaku {
 
     static calculate(hand: Hand): number {
         var count = 0;
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if (meld instanceof Triple || meld instanceof Quadruple) {
                 count++;
             }
-        });
+        }
         if (count === 4) {
             return 2;
         } else {
@@ -258,12 +258,12 @@ export class FanpaiDragonTriple extends Yaku {
     
     static calculate(hand: Hand): number {
         var count = 0;
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if ((meld instanceof Triple || meld instanceof Quadruple) &&
                 meld.suit === Suit.Dragon) {
                 count++;
             }
-        })
+        }
         return count;
     }
 }
@@ -280,13 +280,13 @@ export class FanpaiRoundWind extends Yaku {
     static englishName = "Round Wind";
     
     static calculate(hand: Hand): number {
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if ((meld instanceof Triple || meld instanceof Quadruple) &&
                 meld.suit === Suit.Wind &&
                 meld.tiles[0].value === hand.roundWind) {
                 return 1;
             }
-        });
+        }
         return 0;
     }
 }
@@ -303,13 +303,13 @@ export class FanpaiSeatWind extends Yaku {
     static englishName = "Seat Wind";
     
     static calculate(hand: Hand): number {
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if ((meld instanceof Triple || meld instanceof Quadruple) &&
                 meld.suit === Suit.Wind &&
                 meld.tiles[0].value === hand.seatWind) {
                 return 1;
             }
-        });
+        }
         return 0;
     }
 }
@@ -327,8 +327,7 @@ export class FullFlush extends Yaku {
     
     static calculate(hand: Hand): number {
         var suit: Suit;
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
+        for (const meld of hand.melds) {
             if (suit === undefined) {
                 suit = meld.suit;
             } else if (meld.suit !== suit) {
@@ -353,7 +352,7 @@ export class HalfFlush extends Yaku {
     static calculate(hand: Hand): number {
         var hasHonorTiles = false;
         var suit: Suit = null;
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if (meld.suit === Suit.Wind || meld.suit === Suit.Dragon) {
                 hasHonorTiles = true;
             } else {
@@ -363,7 +362,7 @@ export class HalfFlush extends Yaku {
                     return 0;
                 }
             }
-        });
+        }
         if (hasHonorTiles) {
             return hand.plusOneIfClosed(2);
         } else {
@@ -443,7 +442,7 @@ export class LittleThreeDragons extends Yaku {
     static calculate(hand: Hand): number {
         var pairs = 0;
         var triples = 0;
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if (meld.suit === Suit.Dragon) {
                 if (meld instanceof Pair) {
                     pairs++;
@@ -451,7 +450,7 @@ export class LittleThreeDragons extends Yaku {
                     triples++;
                 }
             }
-        });
+        }
         if (pairs === 1 && triples === 2) {
             return 2;
         } else {
@@ -499,7 +498,7 @@ export class Pinfu extends Yaku {
             return 0;
         }
         
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if (meld instanceof Pair) {
                 if (meld.suit === Suit.Dragon) return 0;
                 if (meld.suit === Suit.Wind) {
@@ -508,7 +507,7 @@ export class Pinfu extends Yaku {
                 }
             }
             if (meld instanceof Triple || meld instanceof Quadruple) return 0;
-        });
+        }
         
         return 1;
     }
@@ -529,11 +528,11 @@ export class PureStraight extends Yaku {
         var suits = [Suit.Character, Suit.Circle, Suit.Bamboo];
         var straights: {[id: number]: boolean[]} = {};
         
-        suits.forEach((suit, i, _) => {
+        for (const suit of suits) {
             straights[suit] = [false, false, false];
-        });
+        }
         
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if (meld instanceof Straight) {
                 if (meld.tiles[0].value === 1) {
                     straights[meld.suit][0] = true;
@@ -543,13 +542,13 @@ export class PureStraight extends Yaku {
                     straights[meld.suit][2] = true;
                 }
             }
-        });
+        }
         
-        suits.forEach((suit, i, _) => {
+        for (const suit of suits) {
             if (straights[suit][0] && straights[suit][1] && straights[suit][2]) {
                 return hand.plusOneIfClosed(1);
             }
-        });
+        }
         return 0;
     }
 }
@@ -610,13 +609,13 @@ export class SevenPairs extends Yaku {
         if (hand.closedMelds.length !== 7) {
             return 0;
         }
-        hand.closedMelds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if (!(meld instanceof Pair) ||
                 pairs.indexOf(meld.toString()) !== -1) {
                 return 0;
             }
             pairs.push(meld.toString());
-        });
+        }
         return 2;
     }
 }
@@ -633,8 +632,7 @@ export class TerminalsAndHonors extends Yaku {
     static englishName = "All terminals & honors";
     
     static calculate(hand: Hand): number {
-        for (var i = 0; i < hand.tiles.length; i++) {
-            var tile = hand.tiles[i];
+        for (const tile of hand.tiles) {
             if (!(tile.type === TileType.Honor || tile.isTerminal())) {
                 return 0;
             }
@@ -655,8 +653,7 @@ export class TerminalsInAllMelds extends Yaku {
     static englishName = "Terminals in all melds";
     
     static calculate(hand: Hand): number {
-        for (var i = 0; i < hand.melds.length; i++) {
-            var meld = hand.melds[i];
+        for (const meld of hand.melds) {
             if (meld instanceof Straight) {
                 if (!meld.tiles[0].isTerminal() &&
                     !meld.tiles[2].isTerminal()) {
@@ -686,7 +683,7 @@ export class TerminalsOrHonorsInAllMelds extends Yaku {
     static calculate(hand: Hand): number {
         var hasHonorTiles = false;
         var hasTerminals = false;
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if (meld.suit === Suit.Wind || meld.suit === Suit.Dragon) {
                 hasHonorTiles = true;
             } else {
@@ -697,7 +694,7 @@ export class TerminalsOrHonorsInAllMelds extends Yaku {
                     return 0;
                 }
             }
-        });
+        }
         if (hasHonorTiles && hasTerminals) {
             return hand.plusOneIfClosed(1);
         } else {
@@ -720,11 +717,11 @@ export class ThreeClosedTriples extends Yaku {
     static calculate(hand: Hand): number {
         var count = 0;
         
-        hand.closedMelds.forEach((meld, i, _) => {
+        for (const meld of hand.closedMelds) {
             if (meld instanceof Triple || meld instanceof Quadruple) {
                 count++;
             }
-        });
+        }
         if (count >= 3) {
             return 2;
         }
@@ -745,7 +742,7 @@ export class ThreeColorStraights extends Yaku {
     
     static calculate(hand: Hand): number {
         var straightsList: boolean[][] = [];
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if (meld instanceof Straight) {
                 var tile = meld.tiles[0];
                 
@@ -760,7 +757,7 @@ export class ThreeColorStraights extends Yaku {
                     return hand.plusOneIfClosed(1);
                 }
             } 
-        });
+        }
         return 0;
     }
 }
@@ -778,12 +775,12 @@ export class ThreeColorTriples extends Yaku {
 
     static calculate(hand: Hand): number {
         var tripleCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if ((meld instanceof Triple || meld instanceof Quadruple) &&
                 meld.tiles[0].type === TileType.Number) {
                 tripleCounts[meld.tiles[0].value]++;
             }
-        });
+        }
         if (Math.max(...tripleCounts) === 3) {
             return 2;
         } else {
@@ -806,11 +803,11 @@ export class ThreeQuadruples extends Yaku {
     static calculate(hand: Hand): number {
         var quadruples = 0;
         
-        hand.melds.forEach((meld, i, _) => {
+        for (const meld of hand.melds) {
             if (meld instanceof Quadruple) {
                 quadruples++;
             }
-        });
+        }
         
         if (quadruples >= 3) {
             return 2;

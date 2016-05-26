@@ -6,6 +6,12 @@ var yaku_1 = require("./yaku");
 var Scorer = (function () {
     function Scorer() {
     }
+    /**
+     * Returns a list of payments to be made to the winner.
+     * If it was a ron, it's a singleton of the points to pay,
+     * and if it was a tsumo, it returns [x, y, y] where x is what the dealer
+     * has to pay, and y is what the non-dealers have to pay.
+     */
     Scorer.calculatePayments = function (hand) {
         var yakus = yaku_1.Yaku.getApplyingYakuList(hand);
         var fu = Scorer.calculateFu(hand, yakus);
@@ -30,16 +36,17 @@ var Scorer = (function () {
         return Math.min(2000, base);
     };
     Scorer.calculateFu = function (hand, yakus) {
+        yakus = yakus ? yakus : [];
         if (yakus.indexOf(yaku_1.SevenPairs) !== -1) {
             return 25;
         }
         else if (yakus.indexOf(yaku_1.AllSimples) !== -1) {
             return 20;
         }
-        return 20
+        return Scorer.roundUpToNearest(10, 20
             + Scorer.calculateFuFromWinMethod(hand)
             + Scorer.calculateFuFromMelds(hand)
-            + Scorer.calculateFuFromWait(hand);
+            + Scorer.calculateFuFromWait(hand));
     };
     Scorer.calculateFuForMeld = function (meld, closed, seatWind, roundWind) {
         if (meld instanceof meld_1.Pair) {
@@ -106,10 +113,11 @@ var Scorer = (function () {
         hand.openMelds.forEach(function (meld, i, _) {
             fu += Scorer.calculateFuForMeld(meld, false, hand.seatWind, hand.roundWind);
         });
+        fu += Scorer.calculateFuForMeld(hand.winningMeld, false, hand.seatWind, hand.roundWind);
         return fu;
     };
     Scorer.calculateFuFromWait = function (hand) {
-        if (hand.isEdgeWait() || hand.isSingleWait) {
+        if (hand.isOneSideWait() || hand.isPairWait()) {
             return 2;
         }
         else {
@@ -119,23 +127,26 @@ var Scorer = (function () {
     Scorer.splitPayment = function (base, winMethod, dealer) {
         if (winMethod === hand_1.WinningMethod.Ron) {
             if (dealer) {
-                return [Scorer.roundUpToNearest100(base * 6)];
+                return [Scorer.roundUpToNearest(100, base * 6)];
             }
             else {
-                return [Scorer.roundUpToNearest100(base * 4)];
+                return [Scorer.roundUpToNearest(100, base * 4)];
             }
         }
         else {
             if (dealer) {
-                return [base * 2, base * 2, base * 2].map(Scorer.roundUpToNearest100);
+                return [base * 2, base * 2, base * 2].map(function (n) { return Scorer.roundUpToNearest(100, n); });
             }
             else {
-                return [base * 2, base, base].map(Scorer.roundUpToNearest100);
+                return [base * 2, base, base].map(function (n) { return Scorer.roundUpToNearest(100, n); });
             }
         }
     };
-    Scorer.roundUpToNearest100 = function (points) {
-        return Math.ceil(points / 100) * 100;
+    /**
+     * digits should be 0.1, 1, 10, etc.
+     */
+    Scorer.roundUpToNearest = function (digits, points) {
+        return Math.ceil(points / digits) * digits;
     };
     return Scorer;
 }());

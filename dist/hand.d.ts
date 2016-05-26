@@ -3,6 +3,7 @@ import { Meld } from "./meld";
 export declare class Hand {
     closedMelds: Meld[];
     openMelds: Meld[];
+    winningMeld: Meld;
     melds: Meld[];
     tiles: Tile[];
     seatWind: Wind;
@@ -12,25 +13,42 @@ export declare class Hand {
     uraDora: Tile[];
     bonuses: WinningBonus[];
     winMethod: WinningMethod;
-    constructor(closedMelds: Meld[], openMelds: Meld[], info: {
+    /**
+     * Put the winning meld in winningMeld, not openMelds.
+     */
+    constructor(closedMelds: Meld[], openMelds: Meld[], winningMeld: Meld, info: {
         seatWind: Wind;
         roundWind: Wind;
         winningTile: Tile;
-        dora: Tile[];
-        uraDora: Tile[];
-        bonuses: WinningBonus[];
         winMethod: WinningMethod;
+        dora?: Tile[];
+        uraDora?: Tile[];
+        bonuses?: WinningBonus[];
     });
     isClosed(): boolean;
-    isEdgeWait(): boolean;
-    isClosedWait(): boolean;
-    isSingleWait(): boolean;
+    /**
+     * Waiting for just one side (e.g. 3 in 1-2-3) of a straight
+     */
+    isOneSideWait(): boolean;
+    /**
+     * Waiting for either side of a straight.
+     * E.g. You have 3-4 and are waiting for either 2 or 5
+     */
+    isTwoSidesWait(): boolean;
+    /**
+     * Waiting for the middle tile of a straight
+     */
+    isMiddleWait(): boolean;
+    /**
+     * Waiting for one of the tiles in a pair
+     */
+    isPairWait(): boolean;
     hasBonus(bonus: WinningBonus): boolean;
-    private getTiles();
     /**
      * Returns points + 1 if closed, just points otherwise
      */
     plusOneIfClosed(points: number): number;
+    private getTiles();
 }
 export declare enum WinningBonus {
     QuadrupleRob = 0,

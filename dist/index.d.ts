@@ -4,5 +4,3 @@
 /// <reference path="scorer.d.ts" />
 /// <reference path="tile.d.ts" />
 /// <reference path="yaku.d.ts" />
-
-

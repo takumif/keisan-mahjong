@@ -4,7 +4,7 @@ var Parser = (function () {
     function Parser() {
     }
     Parser.parseHand = function (text) {
-        throw "unimplemented";
+        throw "parseHand unimplemented";
     };
     Parser.parseTiles = function (text) {
         text = text.replace(/\s|\[|\]|\(|\)/g, "");

@@ -3,6 +3,7 @@
         "src/hand.ts",
         "src/meld.ts",
         "src/parser.ts",
+        "src/scorer.ts",
         "src/tile.ts",
         "src/yaku.ts"
     ],

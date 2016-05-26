@@ -35,6 +35,7 @@ gulp.task("test", function() {
                 "test/test-hand.js",
                 "test/test-meld.js",
                 "test/test-parser.js",
+                "test/test-scorer.js",
                 "test/test-tile.js",
                 "test/test-yaku.js"
             ])

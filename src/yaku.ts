@@ -326,15 +326,15 @@ export class FullFlush extends Yaku {
     static englishName = "Full Flush";
     
     static calculate(hand: Hand): number {
-        var suit: Suit = null;
-        hand.melds.forEach((meld, i, _) => {
+        var suit: Suit;
+        for (var i = 0; i < hand.melds.length; i++) {
             var meld = hand.melds[i];
-            if (suit === null) {
+            if (suit === undefined) {
                 suit = meld.suit;
             } else if (meld.suit !== suit) {
                 return 0;
             }
-        });
+        }
         return hand.plusOneIfClosed(5);
     }
 }
@@ -633,11 +633,12 @@ export class TerminalsAndHonors extends Yaku {
     static englishName = "All terminals & honors";
     
     static calculate(hand: Hand): number {
-        hand.tiles.forEach((tile, i, _) => {
+        for (var i = 0; i < hand.tiles.length; i++) {
+            var tile = hand.tiles[i];
             if (!(tile.type === TileType.Honor || tile.isTerminal())) {
                 return 0;
             }
-        })
+        }
         return 2;
     }
 }
@@ -654,7 +655,8 @@ export class TerminalsInAllMelds extends Yaku {
     static englishName = "Terminals in all melds";
     
     static calculate(hand: Hand): number {
-        hand.melds.forEach((meld, i, _) => {
+        for (var i = 0; i < hand.melds.length; i++) {
+            var meld = hand.melds[i];
             if (meld instanceof Straight) {
                 if (!meld.tiles[0].isTerminal() &&
                     !meld.tiles[2].isTerminal()) {
@@ -665,7 +667,7 @@ export class TerminalsInAllMelds extends Yaku {
                     return 0;
                 }
             }
-        });
+        }
         return hand.plusOneIfClosed(2);
     }
 }

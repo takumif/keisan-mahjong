@@ -9,29 +9,30 @@ A JavaScript/TypeScript library for calculating Riichi (Japanese) Mahjong scores
 to be written
 ```
 
+To get the typings for the Keisan classes, reference `dist/index.d.ts` in your files:
+
+    /// <reference path="path/to/dist/index.d.ts" />
+
 ## Development
 Stuff we use (only used for development purposes, so not really dependencies):
 * TypeScript
 * npm
 * Gulp
 * Jasmine
+* TypeDoc
 
 Clone the repository and run `npm install`.
-You might need to also install gulp client (`npm install -g gulp-cli`).
-Then you can run `gulp build` for transcompiling JavaScript, and `gulp test` for testing.
-
-You can run `typings install` to get the necessary TypeScript definitions.
-You might need to do `npm install -g typings` before that.
+Then you can run `gulp build` for transcompiling JavaScript, `gulp typedoc` for generating the TypeDoc, and `gulp test` for testing.
 
 ## To-Do
 * Write tests for Hand, Meld and Yaku
-* Make Yaku cleaner
-* Debug Yaku
 * Implement Hand methods
 * Implement Parser methods
 * Implement Tile methods
 * Check if honroutou doesn't overlap with other yaku
+* Write more yaku classes
 
 ---
 
-Keisan is based on [Riichi Mahjong Pointer](https://github.com/magicolic/riichi-pointer-js) by [EmeraldCoder](https://github.com/EmeraldCoder) and [blackmage](https://github.com/magicolic-blackmage).
+Keisan is based on [mahjong-tooltips-js](https://github.com/neetsdkasu/mahjong-tools-tips-js) by [neetsdkasu](https://github.com/neetsdkasu)
+and [Riichi Mahjong Pointer](https://github.com/magicolic/riichi-pointer-js) by [EmeraldCoder](https://github.com/EmeraldCoder) and [blackmage](https://github.com/magicolic-blackmage).

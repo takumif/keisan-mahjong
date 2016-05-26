@@ -4,7 +4,7 @@ import {Hand} from "./hand"
 
 export class Parser {
     static parseHand(text: string): Hand {
-        throw "unimplemented";
+        throw "parseHand unimplemented";
     }
     
     static parseTiles(text: string): Tile[] {

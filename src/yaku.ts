@@ -491,24 +491,25 @@ export class Pinfu extends Yaku {
     static englishName = "All Chii / No points";
     
     static calculate(hand: Hand): number {
-        if (!hand.isClosed()    ||
-            hand.isEdgeWait()   ||
-            hand.isClosedWait() ||
-            hand.isSingleWait()) {
+        if (!hand.isClosed() ||
+            !hand.isTwoSidesWait()) {
             return 0;
         }
         
         for (const meld of hand.melds) {
             if (meld instanceof Pair) {
-                if (meld.suit === Suit.Dragon) return 0;
-                if (meld.suit === Suit.Wind) {
-                    if (meld.tiles[0].value === hand.seatWind) return 0;
-                    if (meld.tiles[0].value === hand.roundWind) return 0;
+                if (meld.suit === Suit.Dragon) {
+                    return 0;
+                } else if (meld.suit === Suit.Wind) {
+                    if (meld.tiles[0].value === hand.seatWind ||
+                        meld.tiles[0].value === hand.roundWind) {
+                        return 0;
+                    }
                 }
+            } else if (meld instanceof Triple || meld instanceof Quadruple) {
+                return 0;
             }
-            if (meld instanceof Triple || meld instanceof Quadruple) return 0;
         }
-        
         return 1;
     }
 }
